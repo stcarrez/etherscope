@@ -23,9 +23,10 @@ package body EtherScope.Stats is
    procedure Add (Stats  : in out Statistics;
                   Length : in Net.Uint32) is
       use type Net.Uint32;
+      use type Net.Uint64;
    begin
       Stats.Packets := Stats.Packets + 1;
-      Stats.Bytes   := Stats.Bytes + Length;
+      Stats.Bytes   := Stats.Bytes + Net.Uint64 (Length);
    end Add;
 
 end EtherScope.Stats;
