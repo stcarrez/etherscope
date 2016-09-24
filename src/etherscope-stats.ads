@@ -24,13 +24,13 @@ package EtherScope.Stats is
 
    type Statistics is record
       --  Number of packets seen.
-      Packets   : Net.Uint32;
+      Packets   : Net.Uint32 := 0;
 
       --  Number of bytes seen.
-      Bytes     : Net.Uint32;
+      Bytes     : Net.Uint64 := 0;
 
       --  Bandwidth utilization in bits/sec.
-      Bandwidth : Net.Uint32;
+      Bandwidth : Net.Uint32 := 0;
    end record;
 
    --  Update the statistics after reception of a packet of the given length.
