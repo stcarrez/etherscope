@@ -38,8 +38,10 @@ with EtherScope.Receiver;
 procedure Etheroscope with Priority => System.Priority'First is
 
    use type Interfaces.Unsigned_32;
+   use type UI.Buttons.Button_Index;
 
    Count  : Natural := 0;
+   Mode   : UI.Buttons.Button_Event := EtherScope.Display.B_ETHER;
 
    --  Reserve 32 network buffers.
    NET_BUFFER_SIZE : constant Interfaces.Unsigned_32 := Net.Buffers.NET_ALLOC_SIZE * 32;
@@ -74,7 +76,20 @@ begin
                                Touch  => STM32.Board.Touch_Panel,
                                List   => EtherScope.Display.Buttons,
                                Event  => Action);
-         EtherScope.Display.Display_Devices (Buffer);
+         if Action /= UI.Buttons.NO_EVENT then
+            Mode := Action;
+         end if;
+         case Mode is
+            when EtherScope.Display.B_ETHER =>
+               EtherScope.Display.Display_Devices (Buffer);
+
+            when EtherScope.Display.B_IPv4 =>
+               EtherScope.Display.Display_Protocols (Buffer);
+
+            when others =>
+               null;
+
+         end case;
          EtherScope.Display.Print (Buffer => Buffer,
                                    Text   => Natural'Image (Count));
          STM32.Board.Display.Update_Layer (1);
