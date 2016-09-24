@@ -18,7 +18,7 @@
 with Net;
 package EtherScope.Stats is
 
-   type Device_Count is new Natural range 0 .. 10;
+   type Device_Count is new Natural range 0 .. 5;
 
    subtype Device_Index is Device_Count range 1 .. Device_Count'Last;
 
