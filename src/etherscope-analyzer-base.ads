@@ -36,10 +36,25 @@ package EtherScope.Analyzer.Base is
       IPv4      : EtherScope.Analyzer.IPv4.Device_Table_Stats;
    end record;
 
+   type Protocol_Stats is record
+      Count     : EtherScope.Stats.Protocol_Count := 0;
+
+      --  Global ICMP, IGMP, UDP, TCP statistics.
+      ICMP       : EtherScope.Stats.Statistics;
+      IGMP       : EtherScope.Stats.Statistics;
+      UDP        : EtherScope.Stats.Statistics;
+      TCP        : EtherScope.Stats.Statistics;
+      Unknown    : EtherScope.Stats.Statistics;
+   end record;
+
+   type
    --  Analyze the received packet.
    procedure Analyze (Packet : in out Net.Buffers.Buffer_Type);
 
    --  Get the device statistics.
    function Get_Devices return Device_Stats;
+
+   --  Get the protocol statistics.
+   function Get_Protocols return Protocol_Stats;
 
 end EtherScope.Analyzer.Base;
