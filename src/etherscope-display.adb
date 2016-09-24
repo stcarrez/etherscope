@@ -162,16 +162,15 @@ package body EtherScope.Display is
       procedure Display_Protocol (Name : in String;
                                   Stat : in EtherScope.Stats.Statistics) is
       begin
-         UI.Texts.Draw_String (Buffer, (100, Y), 200, Name);
-         --  UI.Texts.Draw_String (Buffer, (300, Y), 150, Net.Utils.To_String (IP.Ip), RIGHT);
-         UI.Texts.Draw_String (Buffer, (100, Y + 20), 100, Format_Packets (Stat.Packets), RIGHT);
-         UI.Texts.Draw_String (Buffer, (200, Y + 20), 200, Format_Bytes (Stat.Bytes), RIGHT);
-         UI.Texts.Draw_String (Buffer, (400, Y + 20), 80, Format_Bandwidth (Stat.Bandwidth));
+         UI.Texts.Draw_String (Buffer, (100, Y), 150, Name);
+         UI.Texts.Draw_String (Buffer, (150, Y), 100, Format_Packets (Stat.Packets), RIGHT);
+         UI.Texts.Draw_String (Buffer, (250, Y), 150, Format_Bytes (Stat.Bytes), RIGHT);
+         UI.Texts.Draw_String (Buffer, (400, Y), 80, Format_Bandwidth (Stat.Bandwidth));
          Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
                                       X     => 100,
-                                      Y     => Y + 49,
+                                      Y     => Y + 28,
                                       Width => Buffer.Width - 100);
-         Y := Y + 50;
+         Y := Y + 30;
       end Display_Protocol;
 
    begin
