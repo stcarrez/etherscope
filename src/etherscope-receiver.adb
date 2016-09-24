@@ -16,10 +16,11 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Real_Time;
-with STM32.Eth;
 with Net.Buffers;
 with Net.Interfaces;
 with EtherScope.Analyzer.Base;
+with Interfaces;
+
 package body EtherScope.Receiver is
 
    --  ------------------------------
@@ -27,16 +28,23 @@ package body EtherScope.Receiver is
    --  ------------------------------
    task body Controller is
       use type Ada.Real_Time.Time;
+      use type Interfaces.Unsigned_32;
 
       Packet  : Net.Buffers.Buffer_Type;
-      Time    : Ada.Real_Time.Time := Ada.Real_Time.Clock + Ada.Real_Time.Seconds (2);
+      Time    : Ada.Real_Time.Time := Ada.Real_Time.Clock + Ada.Real_Time.Seconds (1);
+      Count   : Natural := 0;
    begin
-      delay until Time;
-      STM32.Eth.Initialize_RMII;
-      Receiver.Ifnet.Initialize;
+      while not Ifnet.Is_Ready loop
+         delay until Ada.Real_Time.Clock + Ada.Real_Time.Seconds (1);
+      end loop;
       Net.Buffers.Allocate (Packet);
       loop
+         if Packet.Is_Null then
+            Net.Buffers.Allocate (Packet);
+         end if;
+
          Ifnet.Receive (Packet);
+         Count := Count + 1;
          EtherScope.Analyzer.Base.Analyze (Packet);
       end loop;
    end Controller;
