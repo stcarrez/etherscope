@@ -12,7 +12,7 @@ The EtherScope uses the following two GitHub projects:
 
   Ada_Drivers_Library   https://github.com/AdaCore/Ada_Drivers_Library.git
 
-  Ada Embedded Network  https://github.com/stcarrez/ada-net.git
+  Ada Embedded Network  https://github.com/stcarrez/ada-enet.git
 
 You need the source of these two projects to buid EtherScope.
 Run the command:
