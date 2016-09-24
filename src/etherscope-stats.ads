@@ -18,9 +18,13 @@
 with Net;
 package EtherScope.Stats is
 
+   --  Device count and index types.
    type Device_Count is new Natural range 0 .. 5;
-
    subtype Device_Index is Device_Count range 1 .. Device_Count'Last;
+
+   --  Protocol count and index types.
+   type Protocol_Count is new Natural range 0 .. 10;
+   subtype Protocol_Index is Protocol_Count range 1 .. Protocol_Count'Last;
 
    type Statistics is record
       --  Number of packets seen.
