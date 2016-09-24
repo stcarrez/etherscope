@@ -21,6 +21,8 @@ with BMP_Fonts;
 with Interfaces;
 with Net.Utils;
 with UI.Texts;
+
+with EtherScope.Stats;
 with EtherScope.Analyzer.Ethernet;
 with EtherScope.Analyzer.IPv4;
 with EtherScope.Analyzer.Base;
@@ -146,6 +148,44 @@ package body EtherScope.Display is
          Y := Y + 50;
       end loop;
    end Display_Devices;
+
+   --  ------------------------------
+   --  Display devices found on the network.
+   --  ------------------------------
+   procedure Display_Protocols (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+      use EtherScope.Analyzer.Base;
+      use UI.Texts;
+
+      Result : constant Analyzer.Base.Protocol_Stats := EtherScope.Analyzer.Base.Get_Protocols;
+      Y      : Natural := 15;
+
+      procedure Display_Protocol (Name : in String;
+                                  Stat : in EtherScope.Stats.Statistics) is
+      begin
+         UI.Texts.Draw_String (Buffer, (100, Y), 200, Name);
+         --  UI.Texts.Draw_String (Buffer, (300, Y), 150, Net.Utils.To_String (IP.Ip), RIGHT);
+         UI.Texts.Draw_String (Buffer, (100, Y + 20), 100, Format_Packets (Stat.Packets), RIGHT);
+         UI.Texts.Draw_String (Buffer, (200, Y + 20), 200, Format_Bytes (Stat.Bytes), RIGHT);
+         UI.Texts.Draw_String (Buffer, (400, Y + 20), 80, Format_Bandwidth (Stat.Bandwidth));
+         Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
+                                      X     => 100,
+                                      Y     => Y + 49,
+                                      Width => Buffer.Width - 100);
+         Y := Y + 50;
+      end Display_Protocol;
+
+   begin
+      Buffer.Fill_Rect (Color  => UI.Texts.Background,
+                        X      => 100,
+                        Y      => 0,
+                        Width  => Buffer.Width - 100,
+                        Height => Buffer.Height);
+      Display_Protocol ("ICMP", Result.ICMP);
+      Display_Protocol ("IGMP", Result.IGMP);
+      Display_Protocol ("UDP", Result.UDP);
+      Display_Protocol ("TCP", Result.TCP);
+      Display_Protocol ("Others", Result.Unknown);
+   end Display_Protocols;
 
    procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                     Text   : in String) is
