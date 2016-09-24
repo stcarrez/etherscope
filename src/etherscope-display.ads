@@ -47,6 +47,9 @@ package EtherScope.Display is
    --  Display devices found on the network.
    procedure Display_Devices (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
+   --  Display devices found on the network.
+   procedure Display_Protocols (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+
    procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                     Text   : in String);
 
