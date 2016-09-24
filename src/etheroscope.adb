@@ -30,7 +30,6 @@ with Net.Buffers;
 with UI.Buttons;
 with EtherScope.Display;
 with EtherScope.Receiver;
-with EtherScope.Analyzer.Base;
 
 --  The main EtherScope task must run at a lower priority as it takes care
 --  of displaying results on the screen while the EtherScope receiver's task
@@ -69,15 +68,13 @@ begin
    loop
       declare
          Action : UI.Buttons.Button_Event;
-         Result : EtherScope.Analyzer.Base.Device_Stats;
          Buffer : constant HAL.Bitmap.Bitmap_Buffer'Class := STM32.Board.Display.Get_Hidden_Buffer (1);
       begin
          UI.Buttons.Get_Event (Buffer => Buffer,
                                Touch  => STM32.Board.Touch_Panel,
                                List   => EtherScope.Display.Buttons,
                                Event  => Action);
-         Result := EtherScope.Analyzer.Base.Get_Devices;
-         EtherScope.Display.Display_Devices (Buffer, Result);
+         EtherScope.Display.Display_Devices (Buffer);
          EtherScope.Display.Print (Buffer => Buffer,
                                    Text   => Natural'Image (Count));
          STM32.Board.Display.Update_Layer (1);
