@@ -25,6 +25,7 @@ package body EtherScope.Analyzer.Base is
    --  analyzer's task and the display main task.
    protected DB is
       function Get_Devices return Device_Stats;
+      function Get_Protocols return Protocol_Stats;
 
       procedure Analyze_Ethernet (Packet : in out Net.Buffers.Buffer_Type;
                                   Device : out EtherScope.Stats.Device_Index);
@@ -50,6 +51,17 @@ package body EtherScope.Analyzer.Base is
          Devices.Count    := Ethernet.Dev_Count;
          return Devices;
       end Get_Devices;
+
+      function Get_Protocols return Protocol_Stats is
+         Protocols   : Protocol_Stats;
+      begin
+         Protocols.ICMP := IPv4.ICMP;
+         Protocols.IGMP := IPv4.IGMP;
+         Protocols.UDP  := IPv4.UDP;
+         Protocols.TCP  := IPv4.TCP;
+         Protocols.Unknown := IPv4.Unknown;
+         return Protocols;
+      end Get_Protocols;
 
       procedure Analyze_Ethernet (Packet : in out Net.Buffers.Buffer_Type;
                                   Device : out EtherScope.Stats.Device_Index) is
@@ -99,5 +111,13 @@ package body EtherScope.Analyzer.Base is
    begin
       return DB.Get_Devices;
    end Get_Devices;
+
+   --  ------------------------------
+   --  Get the protocol statistics.
+   --  ------------------------------
+   function Get_Protocols return Protocol_Stats is
+   begin
+      return DB.Get_Protocols;
+   end Get_Protocols;
 
 end EtherScope.Analyzer.Base;
