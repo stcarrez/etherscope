@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with System;
 with Net.Interfaces.STM32;
 package EtherScope.Receiver is
 
@@ -23,6 +24,7 @@ package EtherScope.Receiver is
 
    --  The task that waits for packets.
    task Controller with
-     Storage_Size => (16 * 1024);
+     Storage_Size => (16 * 1024),
+     Priority => System.Default_Priority;
 
 end EtherScope.Receiver;
