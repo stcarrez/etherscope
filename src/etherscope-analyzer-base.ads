@@ -47,7 +47,6 @@ package EtherScope.Analyzer.Base is
       Unknown    : EtherScope.Stats.Statistics;
    end record;
 
-   type
    --  Analyze the received packet.
    procedure Analyze (Packet : in out Net.Buffers.Buffer_Type);
 
