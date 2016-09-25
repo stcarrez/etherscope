@@ -18,9 +18,13 @@ The EtherScope uses the following two GitHub projects:
 
 * Ada Embedded Network  https://github.com/stcarrez/ada-enet.git
 
+You need the source of these two projects to buid EtherScope.
+Sources must be available in the parent directory (that is '..').
+
 You will also need the GNAT Ada compiler for ARM available at http://libre.adacore.com/
 
-You need the source of these two projects to buid EtherScope.
+# Build
+
 Run the command:
 
   make
