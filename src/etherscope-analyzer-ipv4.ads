@@ -67,4 +67,9 @@ package EtherScope.Analyzer.IPv4 is
                       Result   : in out Analysis;
                       Samples  : in out EtherScope.Stats.Graph_Samples);
 
+   --  Compute the bandwidth utilization for different devices and protocols.
+   procedure Update_Rates (Current  : in out Analysis;
+                           Previous : in out Analysis;
+                           Dt       : in Positive);
+
 end EtherScope.Analyzer.IPv4;
