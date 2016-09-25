@@ -26,6 +26,7 @@ package body EtherScope.Analyzer.Ethernet is
    procedure Analyze (Ether    : in Net.Headers.Ether_Header_Access;
                       Length   : in Net.Uint16;
                       Result   : in out Analysis;
+                      Samples  : in out EtherScope.Stats.Graph_Samples;
                       Device   : out Device_Index) is
       use type Net.Uint16;
       use type Net.Uint32;
@@ -47,7 +48,8 @@ package body EtherScope.Analyzer.Ethernet is
          end if;
          Device := Result.Dev_Count;
       end if;
-      EtherScope.Stats.Add (Result.Devices (Device).Stats, Net.Uint32 (Length));
+      EtherScope.Stats.Add (Samples, EtherScope.Stats.G_ETHERNET,
+                            Result.Devices (Device).Stats, Net.Uint32 (Length));
 
       --  Collect information by Ethernet protocol.
       for I in Result.Protocols'Range loop
