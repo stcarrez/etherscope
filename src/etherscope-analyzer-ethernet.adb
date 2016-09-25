@@ -63,4 +63,20 @@ package body EtherScope.Analyzer.Ethernet is
       end loop;
    end Analyze;
 
+   --  ------------------------------
+   --  Compute the bandwidth utilization for different devices and protocols.
+   --  ------------------------------
+   procedure Update_Rates (Current  : in out Analysis;
+                           Previous : in out Analysis;
+                           Dt       : in Positive) is
+   begin
+      for I in 1 .. Current.Dev_Count loop
+         if I <= Previous.Dev_Count then
+            EtherScope.Stats.Update_Rate (Current.Devices (I).Stats, Previous.Devices (I).Stats, Dt);
+         else
+            Previous.Devices (I) := Current.Devices (I);
+         end if;
+      end loop;
+   end Update_Rates;
+
 end EtherScope.Analyzer.Ethernet;
