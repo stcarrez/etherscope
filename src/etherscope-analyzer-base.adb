@@ -15,10 +15,14 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Real_Time;
+
 with Net.Headers;
 with Net.Protos;
 package body EtherScope.Analyzer.Base is
 
+   use type Ada.Real_Time.Time;
+   use type Ada.Real_Time.Time_Span;
    use type EtherScope.Stats.Device_Count;
 
    --  Protect the access of the analysis results between the
@@ -26,6 +30,8 @@ package body EtherScope.Analyzer.Base is
    protected DB is
       function Get_Devices return Device_Stats;
       function Get_Protocols return Protocol_Stats;
+      procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
+                                      Clear  : in Boolean);
 
       procedure Analyze_Ethernet (Packet : in out Net.Buffers.Buffer_Type;
                                   Device : out EtherScope.Stats.Device_Index);
@@ -34,17 +40,40 @@ package body EtherScope.Analyzer.Base is
                               Device : in EtherScope.Stats.Device_Index);
 
    private
+      Deadline      : Ada.Real_Time.Time := Ada.Real_Time.Clock;
+      Prev_Time     : Ada.Real_Time.Time := Ada.Real_Time.Clock;
+
       --  Ethernet information.
-      Ethernet  : EtherScope.Analyzer.Ethernet.Analysis;
+      Ethernet      : EtherScope.Analyzer.Ethernet.Analysis;
+      Prev_Ethernet : EtherScope.Analyzer.Ethernet.Analysis;
 
       --  IPv4 analysis.
-      IPv4      : EtherScope.Analyzer.IPv4.Analysis;
+      IPv4          : EtherScope.Analyzer.IPv4.Analysis;
+      Prev_IPv4     : EtherScope.Analyzer.IPv4.Analysis;
 
       --  Pending samples for the graphs.
       Samples   : EtherScope.Stats.Graph_Samples;
    end DB;
 
+   ONE_MS : constant Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (1);
+
    protected body DB is
+
+      procedure Update_Rates is
+         Now : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
+      begin
+         if Now > Deadline then
+            declare
+               Dt  : constant Ada.Real_Time.Time_Span := Now - Prev_Time;
+               MS  : constant Integer := Dt / ONE_MS;
+            begin
+               EtherScope.Analyzer.Ethernet.Update_Rates (Ethernet, Prev_Ethernet, MS);
+               EtherScope.Analyzer.IPv4.Update_Rates (IPv4, Prev_IPv4, MS);
+               Prev_Time := Now;
+               Deadline := Deadline + Ada.Real_Time.Seconds (1);
+            end;
+         end if;
+      end Update_Rates;
 
       function Get_Devices return Device_Stats is
          Devices   : Device_Stats;
@@ -66,6 +95,15 @@ package body EtherScope.Analyzer.Base is
          return Protocols;
       end Get_Protocols;
 
+      procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
+                                      Clear  : in Boolean) is
+      begin
+         Result := Samples;
+         for I in Samples'Range loop
+            Samples (I) := 0;
+         end loop;
+      end Update_Graph_Samples;
+
       procedure Analyze_Ethernet (Packet : in out Net.Buffers.Buffer_Type;
                                   Device : out EtherScope.Stats.Device_Index) is
          Ether   : Net.Headers.Ether_Header_Access;
@@ -78,7 +116,7 @@ package body EtherScope.Analyzer.Base is
       procedure Analyze_IPv4 (Packet : in out Net.Buffers.Buffer_Type;
                               Device : in EtherScope.Stats.Device_Index) is
       begin
-         EtherScope.Analyzer.IPv4.Analyze (Packet, Device, IPv4);
+         EtherScope.Analyzer.IPv4.Analyze (Packet, Device, IPv4, Samples);
       end Analyze_IPv4;
 
    end DB;
@@ -122,5 +160,11 @@ package body EtherScope.Analyzer.Base is
    begin
       return DB.Get_Protocols;
    end Get_Protocols;
+
+   procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
+                                   Clear   : in Boolean) is
+   begin
+      DB.Update_Graph_Samples (Samples, Clear);
+   end Update_Graph_Samples;
 
 end EtherScope.Analyzer.Base;
