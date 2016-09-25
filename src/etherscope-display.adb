@@ -15,6 +15,8 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Real_Time;
+
 with STM32.Board;
 with Bitmapped_Drawing;
 with BMP_Fonts;
@@ -90,6 +92,15 @@ package body EtherScope.Display is
 
       --  Initialize touch panel
       STM32.Board.Touch_Panel.Initialize;
+
+      for I in Graphs'Range loop
+         EtherScope.Display.Use_Graph.Initialize (Graphs (I),
+                                                  X      => 0,
+                                                  Y      => 200,
+                                                  Width  => 480,
+                                                  Height => 72,
+                                                  Rate   => Ada.Real_Time.Milliseconds (250));
+      end loop;
    end Initialize;
 
    --  ------------------------------
@@ -99,12 +110,7 @@ package body EtherScope.Display is
       Y : constant Natural := 5;
    begin
       Buffer.Fill (UI.Texts.Background);
-      UI.Buttons.Draw_Buttons (Buffer => Buffer,
-                               List   => Buttons,
-                               X      => 0,
-                               Y      => 0,
-                               Width  => 100,
-                               Height => 30);
+      Draw_Buttons (Buffer);
       Buffer.Draw_Vertical_Line (Color  => HAL.Bitmap.White_Smoke,
                                  X      => 100,
                                  Y      => 0,
@@ -114,6 +120,30 @@ package body EtherScope.Display is
                                    Y     => Y,
                                    Width => 480);
    end Draw_Frame;
+
+   --  ------------------------------
+   --  Draw the display buttons.
+   --  ------------------------------
+   procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   begin
+      UI.Buttons.Draw_Buttons (Buffer => Buffer,
+                               List   => Buttons,
+                               X      => 0,
+                               Y      => 0,
+                               Width  => 100,
+                               Height => 30);
+   end Draw_Buttons;
+
+   procedure Refresh_Graphs (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+      Now     : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
+      Samples : EtherScope.Stats.Graph_Samples;
+   begin
+      EtherScope.Analyzer.Base.Update_Graph_Samples (Samples, True);
+      for I in Samples'Range loop
+         Use_Graph.Add_Sample (Graphs (I), Samples (I), Now);
+      end loop;
+      Use_Graph.Draw (Buffer, Graphs (EtherScope.Stats.G_ETHERNET));
+   end Refresh_Graphs;
 
    --  ------------------------------
    --  Display devices found on the network.
