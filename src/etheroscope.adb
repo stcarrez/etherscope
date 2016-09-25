@@ -47,6 +47,8 @@ procedure Etheroscope with Priority => System.Priority'First is
 
    --  Reserve 32 network buffers.
    NET_BUFFER_SIZE : constant Interfaces.Unsigned_32 := Net.Buffers.NET_ALLOC_SIZE * 32;
+
+   Button_Changed : Boolean := False;
 begin
    STM32.RNG.Interrupts.Initialize_RNG;
    STM32.Button.Initialize;
@@ -68,25 +70,31 @@ begin
    Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => NET_BUFFER_SIZE), NET_BUFFER_SIZE);
    EtherScope.Receiver.Ifnet.Initialize;
 
-   EtherScope.Display.Use_Graph.Initialize (EtherScope.Display.B_Graph,
-                                            X      => 0,
-                                            Y      => 200,
-                                            Width  => 480,
-                                            Height => 72,
-                                            Rate   => Ada.Real_Time.Seconds (1));
-
    --  Loop to retrieve the analysis and display them.
    loop
       declare
-         Action : UI.Buttons.Button_Event;
-         Buffer : constant HAL.Bitmap.Bitmap_Buffer'Class := STM32.Board.Display.Get_Hidden_Buffer (1);
+         Action  : UI.Buttons.Button_Event;
+         Buffer  : constant HAL.Bitmap.Bitmap_Buffer'Class := STM32.Board.Display.Get_Hidden_Buffer (1);
       begin
+         --  We updated the buttons in the previous layer and
+         --  we must update them in the second one.
+         if Button_Changed then
+            EtherScope.Display.Draw_Buttons (Buffer);
+            Button_Changed := False;
+         end if;
+
          UI.Buttons.Get_Event (Buffer => Buffer,
                                Touch  => STM32.Board.Touch_Panel,
                                List   => EtherScope.Display.Buttons,
                                Event  => Action);
          if Action /= UI.Buttons.NO_EVENT then
             Mode := Action;
+            UI.Buttons.Set_Active (EtherScope.Display.Buttons, Action, Button_Changed);
+
+            --  Update the buttons in the first layer.
+            if Button_Changed then
+               EtherScope.Display.Draw_Buttons (Buffer);
+            end if;
          end if;
          case Mode is
             when EtherScope.Display.B_ETHER =>
@@ -99,6 +107,7 @@ begin
                null;
 
          end case;
+         EtherScope.Display.Refresh_Graphs (Buffer);
          EtherScope.Display.Print (Buffer => Buffer,
                                    Text   => Natural'Image (Count));
          STM32.Board.Display.Update_Layer (1);
