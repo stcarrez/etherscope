@@ -25,7 +25,8 @@ package body EtherScope.Analyzer.IPv4 is
    --  ------------------------------
    procedure Analyze (Packet   : in Net.Buffers.Buffer_Type;
                       Device   : in Device_Index;
-                      Result   : in out Analysis) is
+                      Result   : in out Analysis;
+                      Samples  : in out EtherScope.Stats.Graph_Samples) is
       use type Net.Ip_Addr;
 
       Ip_Hdr : constant Net.Headers.IP_Header_Access := Packet.IP;
@@ -41,19 +42,19 @@ package body EtherScope.Analyzer.IPv4 is
       --  Collect per IPv4 protocol statistics.
       case Ip_Hdr.Ip_P is
          when Net.Protos.IPv4.P_UDP =>
-            EtherScope.Stats.Add (Result.UDP, Length);
+            EtherScope.Stats.Add (Samples, EtherScope.Stats.G_UDP, Result.UDP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).UDP, Length);
 
          when Net.Protos.IPv4.P_TCP =>
-            EtherScope.Stats.Add (Result.TCP, Length);
+            EtherScope.Stats.Add (Samples, EtherScope.Stats.G_TCP, Result.TCP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).TCP, Length);
 
          when Net.Protos.IPv4.P_ICMP =>
-            EtherScope.Stats.Add (Result.ICMP, Length);
+            EtherScope.Stats.Add (Samples, EtherScope.Stats.G_ICMP, Result.ICMP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).ICMP, Length);
 
          when Net.Protos.IPv4.P_IGMP =>
-            EtherScope.Stats.Add (Result.IGMP, Length);
+            EtherScope.Stats.Add (Samples, EtherScope.Stats.G_IGMP, Result.IGMP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).IGMP, Length);
 
          when others =>
