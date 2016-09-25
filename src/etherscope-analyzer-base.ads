@@ -51,10 +51,10 @@ package EtherScope.Analyzer.Base is
    procedure Analyze (Packet : in out Net.Buffers.Buffer_Type);
 
    --  Get the device statistics.
-   function Get_Devices return Device_Stats;
+   procedure Get_Devices (Into : out Device_Stats);
 
    --  Get the protocol statistics.
-   function Get_Protocols return Protocol_Stats;
+   procedure Get_Protocols (Into : out Protocol_Stats);
 
    procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
                                    Clear   : in Boolean);
