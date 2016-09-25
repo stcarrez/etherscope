@@ -56,4 +56,11 @@ package EtherScope.Stats is
                   Stats   : in out Statistics;
                   Length  : in Net.Uint32);
 
+   --  Compute the bandwidth utilization in bits per second.  The <tt>Dt</tt> is the
+   --  delta time in milliseconds that ellapsed between the two samples.  After the
+   --  call, <tt>Previous</tt> contains the same value as <tt>Current</tt>.
+   procedure Update_Rate (Current  : in out Statistics;
+                          Previous : in out Statistics;
+                          Dt       : in Positive);
+
 end EtherScope.Stats;
