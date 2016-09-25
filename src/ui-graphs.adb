@@ -59,6 +59,9 @@ package body UI.Graphs is
             else
                Graph.Last_Pos := Graph.Last_Pos + 1;
             end if;
+            if Graph.Sample_Count < Graph.Samples'Length then
+               Graph.Sample_Count := Graph.Sample_Count + 1;
+            end if;
             Graph.Deadline := Graph.Deadline + Graph.Rate;
 
             --  Check if next deadline has passed.
@@ -104,16 +107,27 @@ package body UI.Graphs is
       if Graph.Max_Value = Value_Type'First then
          return;
       end if;
+      if Pos + Graph.Sample_Count > Graph.Width then
+         Pos := Graph.Sample_Count - Graph.Width;
+      end if;
       while X < Last_X loop
          V := Graph.Samples (Pos);
          if V /= Value_Type'First then
             H := Natural ((V * Value_Type (Graph.Height)) / Graph.Max_Value);
+            if H > Graph.Height then
+               H := Graph.Height;
+            end if;
 
-            Buffer.Draw_Vertical_Line (Color  => Graph.Foreground,
-                                       X      => X,
-                                       Y      => Graph.Pos.Y + Graph.Height - H,
-                                       Height => H);
+--              Buffer.Draw_Vertical_Line (Color  => Graph.Foreground,
+--                                         X      => X,
+--                                         Y      => Graph.Pos.Y + Graph.Height - H,
+--                                         Height => H);
+         else
+            H := 1;
          end if;
+         Buffer.Set_Pixel (X     => X,
+                           Y     => Graph.Pos.Y + Graph.Height - H,
+                           Value => Graph.Foreground);
          if Pos = Graph.Samples'Last then
             Pos := Graph.Samples'First;
          else
