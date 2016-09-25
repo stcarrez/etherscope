@@ -64,4 +64,9 @@ package EtherScope.Analyzer.Ethernet is
                       Samples  : in out EtherScope.Stats.Graph_Samples;
                       Device   : out Device_Index);
 
+   --  Compute the bandwidth utilization for different devices and protocols.
+   procedure Update_Rates (Current  : in out Analysis;
+                           Previous : in out Analysis;
+                           Dt       : in Positive);
+
 end EtherScope.Analyzer.Ethernet;
