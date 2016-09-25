@@ -46,6 +46,9 @@ package body EtherScope.Display is
    MB : constant Net.Uint64 := KB * KB;
    GB : constant Net.Uint64 := MB * MB;
 
+   Devices   : Analyzer.Base.Device_Stats;
+   Protocols : Analyzer.Base.Protocol_Stats;
+
    --  Convert the integer to a string without a leading space.
    function Image (Value : in Net.Uint32) return String is
       Result : constant String := Net.Uint32'Image (Value);
@@ -79,7 +82,15 @@ package body EtherScope.Display is
 
    function Format_Bandwidth (Value : in Net.Uint32) return String is
    begin
-      return Net.Uint32'Image (Value);
+      if Value < Net.Uint32 (KB) then
+         return Image (Net.Uint32 (Value));
+      elsif Value < Net.Uint32 (MB) then
+         return Image (Value / Net.Uint32 (KB)) & "."
+           & Image (((Value mod Net.Uint32 (KB)) * 10) / Net.Uint32 (KB)) & "Kbs";
+      else
+         return Image (Value / Net.Uint32 (MB)) & "."
+           & Image (((Value mod Net.Uint32 (MB)) * 10) / Net.Uint32 (MB)) & "Mbs";
+      end if;
    end Format_Bandwidth;
 
    --  ------------------------------
@@ -152,18 +163,18 @@ package body EtherScope.Display is
       use EtherScope.Analyzer.Base;
       use UI.Texts;
 
-      Result : constant Analyzer.Base.Device_Stats := EtherScope.Analyzer.Base.Get_Devices;
       Y      : Natural := 15;
    begin
+      EtherScope.Analyzer.Base.Get_Devices (Devices);
       Buffer.Fill_Rect (Color  => UI.Texts.Background,
                         X      => 100,
                         Y      => 0,
                         Width  => Buffer.Width - 100,
                         Height => Buffer.Height);
-      for I in 1 .. Result.Count loop
+      for I in 1 .. Devices.Count loop
          declare
-            Ethernet : EtherScope.Analyzer.Ethernet.Device_Stats renames Result.Ethernet (I);
-            IP       : EtherScope.Analyzer.IPv4.Device_Stats renames Result.IPv4 (I);
+            Ethernet : EtherScope.Analyzer.Ethernet.Device_Stats renames Devices.Ethernet (I);
+            IP       : EtherScope.Analyzer.IPv4.Device_Stats renames Devices.IPv4 (I);
          begin
             UI.Texts.Draw_String (Buffer, (100, Y), 200, Net.Utils.To_String (Ethernet.Mac));
             UI.Texts.Draw_String (Buffer, (300, Y), 150, Net.Utils.To_String (IP.Ip), RIGHT);
@@ -186,7 +197,6 @@ package body EtherScope.Display is
       use EtherScope.Analyzer.Base;
       use UI.Texts;
 
-      Result : constant Analyzer.Base.Protocol_Stats := EtherScope.Analyzer.Base.Get_Protocols;
       Y      : Natural := 15;
 
       procedure Display_Protocol (Name : in String;
@@ -194,8 +204,8 @@ package body EtherScope.Display is
       begin
          UI.Texts.Draw_String (Buffer, (100, Y), 150, Name);
          UI.Texts.Draw_String (Buffer, (150, Y), 100, Format_Packets (Stat.Packets), RIGHT);
-         UI.Texts.Draw_String (Buffer, (250, Y), 150, Format_Bytes (Stat.Bytes), RIGHT);
-         UI.Texts.Draw_String (Buffer, (400, Y), 80, Format_Bandwidth (Stat.Bandwidth));
+         UI.Texts.Draw_String (Buffer, (250, Y), 100, Format_Bytes (Stat.Bytes), RIGHT);
+         UI.Texts.Draw_String (Buffer, (350, Y), 100, Format_Bandwidth (Stat.Bandwidth), RIGHT);
          Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
                                       X     => 100,
                                       Y     => Y + 28,
@@ -204,16 +214,17 @@ package body EtherScope.Display is
       end Display_Protocol;
 
    begin
+      EtherScope.Analyzer.Base.Get_Protocols (Protocols);
       Buffer.Fill_Rect (Color  => UI.Texts.Background,
                         X      => 100,
                         Y      => 0,
                         Width  => Buffer.Width - 100,
                         Height => Buffer.Height);
-      Display_Protocol ("ICMP", Result.ICMP);
-      Display_Protocol ("IGMP", Result.IGMP);
-      Display_Protocol ("UDP", Result.UDP);
-      Display_Protocol ("TCP", Result.TCP);
-      Display_Protocol ("Others", Result.Unknown);
+      Display_Protocol ("ICMP", Protocols.ICMP);
+      Display_Protocol ("IGMP", Protocols.IGMP);
+      Display_Protocol ("UDP", Protocols.UDP);
+      Display_Protocol ("TCP", Protocols.TCP);
+      Display_Protocol ("Others", Protocols.Unknown);
    end Display_Protocols;
 
    procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
