@@ -61,6 +61,7 @@ package EtherScope.Analyzer.Ethernet is
    procedure Analyze (Ether    : in Net.Headers.Ether_Header_Access;
                       Length   : in Net.Uint16;
                       Result   : in out Analysis;
+                      Samples  : in out EtherScope.Stats.Graph_Samples;
                       Device   : out Device_Index);
 
 end EtherScope.Analyzer.Ethernet;
