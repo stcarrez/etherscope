@@ -39,6 +39,9 @@ package body EtherScope.Analyzer.Base is
 
       --  IPv4 analysis.
       IPv4      : EtherScope.Analyzer.IPv4.Analysis;
+
+      --  Pending samples for the graphs.
+      Samples   : EtherScope.Stats.Graph_Samples;
    end DB;
 
    protected body DB is
@@ -69,7 +72,7 @@ package body EtherScope.Analyzer.Base is
       begin
          Ether := Packet.Ethernet;
          EtherScope.Analyzer.Ethernet.Analyze (Ether, Net.Uint16 (Packet.Get_Length),
-                                               Ethernet, Device);
+                                               Ethernet, Samples, Device);
       end Analyze_Ethernet;
 
       procedure Analyze_IPv4 (Packet : in out Net.Buffers.Buffer_Type;
