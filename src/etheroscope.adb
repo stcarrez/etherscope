@@ -18,6 +18,8 @@
 with System;
 with Interfaces;
 
+with Ada.Real_Time;
+
 with STM32.Button;
 with STM32.Board;
 with STM32.RNG.Interrupts;
@@ -65,6 +67,13 @@ begin
 
    Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => NET_BUFFER_SIZE), NET_BUFFER_SIZE);
    EtherScope.Receiver.Ifnet.Initialize;
+
+   EtherScope.Display.Use_Graph.Initialize (EtherScope.Display.B_Graph,
+                                            X      => 0,
+                                            Y      => 200,
+                                            Width  => 480,
+                                            Height => 72,
+                                            Rate   => Ada.Real_Time.Seconds (1));
 
    --  Loop to retrieve the analysis and display them.
    loop
