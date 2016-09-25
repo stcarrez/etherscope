@@ -16,12 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with HAL.Bitmap;
-with UI.Buttons;
-package EtherScope.Display is
 
-   Default_Text_Color       : constant HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Dark_Blue;
-   Default_Background_Color : constant HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Light_Grey;
-   Current_Background_Color : HAL.Bitmap.Bitmap_Color := Default_Background_Color;
+with Net;
+
+with UI.Buttons;
+with UI.Graphs;
+package EtherScope.Display is
 
    B_ETHER : constant UI.Buttons.Button_Index := 1;
    B_IPv4  : constant UI.Buttons.Button_Index := 2;
@@ -37,6 +37,11 @@ package EtherScope.Display is
       B_IGMP  => (Name => "IGMP ", others => <>),
       B_UDP   => (Name => "UDP  ", others => <>),
       B_TCP   => (Name => "TCP  ", others => <>));
+
+   package Use_Graph is new UI.Graphs (Value_Type => Net.Uint64,
+                                       Graph_Size => 1024);
+
+   B_Graph : Use_Graph.Graph_Type;
 
    --  Initialize the display.
    procedure Initialize;
