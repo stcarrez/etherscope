@@ -24,6 +24,8 @@ with EtherScope.Stats;
 --  computed by the Ethernet analyzer based on the source Ethernet address.
 --  When we detect several IP addresses for the same device, the Multihome flag
 --  is set.
+--
+--  We also collect global IPv4 protocol statistics.
 package EtherScope.Analyzer.IPv4 is
 
    subtype Device_Index is EtherScope.Stats.Device_Index;
@@ -62,6 +64,7 @@ package EtherScope.Analyzer.IPv4 is
    --  Analyze the packet and update the analysis.
    procedure Analyze (Packet   : in Net.Buffers.Buffer_Type;
                       Device   : in Device_Index;
-                      Result   : in out Analysis);
+                      Result   : in out Analysis;
+                      Samples  : in out EtherScope.Stats.Graph_Samples);
 
 end EtherScope.Analyzer.IPv4;
