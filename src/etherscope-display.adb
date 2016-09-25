@@ -220,6 +220,14 @@ package body EtherScope.Display is
                         Y      => 0,
                         Width  => Buffer.Width - 100,
                         Height => Buffer.Height);
+
+      --  Draw some column header.
+      UI.Texts.Draw_String (Buffer, (100, Y), 150, "Protocol");
+      UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
+      UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
+      UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
+      Y := Y + 30;
+
       Display_Protocol ("ICMP", Protocols.ICMP);
       Display_Protocol ("IGMP", Protocols.IGMP);
       Display_Protocol ("UDP", Protocols.UDP);
