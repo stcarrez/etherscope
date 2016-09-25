@@ -28,8 +28,8 @@ package body EtherScope.Analyzer.Base is
    --  Protect the access of the analysis results between the
    --  analyzer's task and the display main task.
    protected DB is
-      function Get_Devices return Device_Stats;
-      function Get_Protocols return Protocol_Stats;
+      procedure Get_Devices (Devices : out Device_Stats);
+      procedure Get_Protocols (Protocols : out Protocol_Stats);
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
                                       Clear  : in Boolean);
 
@@ -70,29 +70,27 @@ package body EtherScope.Analyzer.Base is
                EtherScope.Analyzer.Ethernet.Update_Rates (Ethernet, Prev_Ethernet, MS);
                EtherScope.Analyzer.IPv4.Update_Rates (IPv4, Prev_IPv4, MS);
                Prev_Time := Now;
-               Deadline := Deadline + Ada.Real_Time.Seconds (1);
+               Deadline := Deadline + Ada.Real_Time.Seconds (10);
             end;
          end if;
       end Update_Rates;
 
-      function Get_Devices return Device_Stats is
-         Devices   : Device_Stats;
+      procedure Get_Devices (Devices : out Device_Stats) is
       begin
+         Update_Rates;
          Devices.Ethernet := Ethernet.Devices;
          Devices.IPv4     := IPv4.Devices;
          Devices.Count    := Ethernet.Dev_Count;
-         return Devices;
       end Get_Devices;
 
-      function Get_Protocols return Protocol_Stats is
-         Protocols   : Protocol_Stats;
+      procedure Get_Protocols (Protocols : out Protocol_Stats) is
       begin
+         Update_Rates;
          Protocols.ICMP := IPv4.ICMP;
          Protocols.IGMP := IPv4.IGMP;
          Protocols.UDP  := IPv4.UDP;
          Protocols.TCP  := IPv4.TCP;
          Protocols.Unknown := IPv4.Unknown;
-         return Protocols;
       end Get_Protocols;
 
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
@@ -148,17 +146,17 @@ package body EtherScope.Analyzer.Base is
    --  ------------------------------
    --  Get the device statistics.
    --  ------------------------------
-   function Get_Devices return Device_Stats is
+   procedure Get_Devices (Into : out Device_Stats) is
    begin
-      return DB.Get_Devices;
+      DB.Get_Devices (Into);
    end Get_Devices;
 
    --  ------------------------------
    --  Get the protocol statistics.
    --  ------------------------------
-   function Get_Protocols return Protocol_Stats is
+   procedure Get_Protocols (Into : out Protocol_Stats) is
    begin
-      return DB.Get_Protocols;
+      DB.Get_Protocols (Into);
    end Get_Protocols;
 
    procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
