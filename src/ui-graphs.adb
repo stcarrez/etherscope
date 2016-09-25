@@ -107,7 +107,7 @@ package body UI.Graphs is
       if Graph.Max_Value = Value_Type'First then
          return;
       end if;
-      if Pos + Graph.Sample_Count > Graph.Width then
+      if Pos + Graph.Sample_Count - 1 > Graph.Width then
          Pos := Graph.Sample_Count - Graph.Width;
       end if;
       while X < Last_X loop
