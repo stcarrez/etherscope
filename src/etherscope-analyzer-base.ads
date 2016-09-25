@@ -56,4 +56,7 @@ package EtherScope.Analyzer.Base is
    --  Get the protocol statistics.
    function Get_Protocols return Protocol_Stats;
 
+   procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
+                                   Clear   : in Boolean);
+
 end EtherScope.Analyzer.Base;
