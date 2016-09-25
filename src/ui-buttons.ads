@@ -20,6 +20,14 @@ with HAL.Touch_Panel;
 with Bitmapped_Drawing;
 package UI.Buttons is
 
+   --  Button colors (inactive).
+   Foreground        : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
+   Background        : HAL.Bitmap.Bitmap_Color := (255, 201, 195, 190);
+
+   --  Button colors (active).
+   Active_Foreground : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
+   Active_Background : HAL.Bitmap.Bitmap_Color := (255, 227, 227, 227);
+
    type Button_State is (B_PRESSED, B_RELEASED, B_DISABLED);
 
    type Button_Type is record
@@ -51,10 +59,16 @@ package UI.Buttons is
                            Width  : in Natural;
                            Height : in Natural);
 
+   --  Set the active button in a list of button.  Update <tt>Change</tt> to indicate whether
+   --  some button state was changed and a redraw is necessary.
+   procedure Set_Active (List    : in out Button_Array;
+                         Index   : in Button_Event;
+                         Changed : out Boolean);
+
    --  Check the touch panel for a button being pressed.
    procedure Get_Event (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                         Touch  : in out HAL.Touch_Panel.Touch_Panel_Device'Class;
-                        List   : in out Button_Array;
+                        List   : in Button_Array;
                         Event  : out Button_Event);
 
 end UI.Buttons;
