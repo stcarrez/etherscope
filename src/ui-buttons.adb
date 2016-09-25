@@ -19,18 +19,26 @@ with Bitmapped_Drawing;
 with Bmp_Fonts;
 package body UI.Buttons is
 
+
    --  ------------------------------
    --  Draw the button in its current state on the bitmap.
    --  ------------------------------
    procedure Draw_Button (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                           Button : in Button_Type) is
+      Color : constant HAL.Bitmap.Bitmap_Color
+        := (if Button.State = B_RELEASED then Background else Active_Background);
    begin
+      Buffer.Fill_Rect (Color  => Color,
+                        X      => Button.Pos.X + 1,
+                        Y      => Button.Pos.Y + 1,
+                        Width  => Button.Width - 2,
+                        Height => Button.Height - 2);
       Bitmapped_Drawing.Draw_String (Buffer,
                                      Start      => (Button.Pos.X + 2, Button.Pos.Y + 2),
                                      Msg        => Button.Name,
                                      Font       => Bmp_Fonts.Font16x24,
-                                     Foreground => HAL.Bitmap.White,
-                                     Background => HAL.Bitmap.Transparent);
+                                     Foreground => Foreground,
+                                     Background => Color);
    end Draw_Button;
 
    --  ------------------------------
@@ -55,11 +63,32 @@ package body UI.Buttons is
    end Draw_Buttons;
 
    --  ------------------------------
+   --  Set the active button in a list of button.  Update <tt>Change</tt> to indicate whether
+   --  some button state was changed and a redraw is necessary.
+   --  ------------------------------
+   procedure Set_Active (List    : in out Button_Array;
+                         Index   : in Button_Event;
+                         Changed : out Boolean) is
+      State : Button_State;
+   begin
+      Changed := False;
+      for I in List'Range loop
+         if List (I).State /= B_DISABLED then
+            State := (if I = Index then B_PRESSED else B_RELEASED);
+            if State /= List (I).State then
+               List (I).State := State;
+               Changed := True;
+            end if;
+         end if;
+      end loop;
+   end Set_Active;
+
+   --  ------------------------------
    --  Check the touch panel for a button being pressed.
    --  ------------------------------
    procedure Get_Event (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                         Touch  : in out HAL.Touch_Panel.Touch_Panel_Device'Class;
-                        List   : in out Button_Array;
+                        List   : in Button_Array;
                         Event  : out Button_Event) is
       State : constant HAL.Touch_Panel.TP_State := Touch.Get_All_Touch_Points;
       X     : Natural;
@@ -73,7 +102,6 @@ package body UI.Buttons is
               and X < List (I).Pos.X + List (I).Width
               and Y < List (I).Pos.Y + List (I).Height
             then
-               List (I).State := B_PRESSED;
                Event := I;
                return;
             end if;
