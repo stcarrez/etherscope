@@ -20,6 +20,8 @@ with Net.Protos.IPv4;
 
 package body EtherScope.Analyzer.IPv4 is
 
+   use type EtherScope.Stats.Device_Count;
+
    --  ------------------------------
    --  Analyze the packet and update the analysis.
    --  ------------------------------
@@ -33,6 +35,9 @@ package body EtherScope.Analyzer.IPv4 is
       Length : constant Net.Uint32 := Net.Uint32 (Packet.Get_Length);
    begin
       if Result.Devices (Device).Ip /= Ip_Hdr.Ip_Src then
+         if Device > Result.Count then
+            Result.Count := Device;
+         end if;
          if Result.Devices (Device).Ip /= (0, 0, 0, 0) then
             Result.Devices (Device).Multihome := True;
          end if;
@@ -63,5 +68,30 @@ package body EtherScope.Analyzer.IPv4 is
 
       end case;
    end Analyze;
+
+   --  ------------------------------
+   --  Compute the bandwidth utilization for different devices and protocols.
+   --  ------------------------------
+   procedure Update_Rates (Current  : in out Analysis;
+                           Previous : in out Analysis;
+                           Dt       : in Positive) is
+   begin
+      for I in 1 .. Current.Count loop
+         if I <= Previous.Count then
+            EtherScope.Stats.Update_Rate (Current.Devices (I).ICMP, Previous.Devices (I).ICMP, Dt);
+            EtherScope.Stats.Update_Rate (Current.Devices (I).IGMP, Previous.Devices (I).IGMP, Dt);
+            EtherScope.Stats.Update_Rate (Current.Devices (I).UDP, Previous.Devices (I).UDP, Dt);
+            EtherScope.Stats.Update_Rate (Current.Devices (I).TCP, Previous.Devices (I).TCP, Dt);
+         else
+            Previous.Devices (I) := Current.Devices (I);
+         end if;
+      end loop;
+      Previous.Count := Current.Count;
+
+      EtherScope.Stats.Update_Rate (Current.ICMP, Previous.ICMP, Dt);
+      EtherScope.Stats.Update_Rate (Current.IGMP, Previous.IGMP, Dt);
+      EtherScope.Stats.Update_Rate (Current.UDP, Previous.UDP, Dt);
+      EtherScope.Stats.Update_Rate (Current.TCP, Previous.TCP, Dt);
+   end Update_Rates;
 
 end EtherScope.Analyzer.IPv4;
