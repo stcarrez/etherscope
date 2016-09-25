@@ -26,6 +26,15 @@ package EtherScope.Stats is
    type Protocol_Count is new Natural range 0 .. 10;
    subtype Protocol_Index is Protocol_Count range 1 .. Protocol_Count'Last;
 
+   type Graph_Kind is (G_ETHERNET,
+                       G_IPv4,
+                       G_ICMP,
+                       G_IGMP,
+                       G_UDP,
+                       G_TCP);
+
+   type Graph_Samples is array (Graph_Kind) of Net.Uint64;
+
    type Statistics is record
       --  Number of packets seen.
       Packets   : Net.Uint32 := 0;
@@ -40,5 +49,11 @@ package EtherScope.Stats is
    --  Update the statistics after reception of a packet of the given length.
    procedure Add (Stats  : in out Statistics;
                   Length : in Net.Uint32);
+
+   --  Update the statistics after reception of a packet of the given length.
+   procedure Add (Samples : in out Graph_Samples;
+                  Kind    : in Graph_Kind;
+                  Stats   : in out Statistics;
+                  Length  : in Net.Uint32);
 
 end EtherScope.Stats;
