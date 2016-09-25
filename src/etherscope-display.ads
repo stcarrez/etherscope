@@ -21,6 +21,7 @@ with Net;
 
 with UI.Buttons;
 with UI.Graphs;
+with EtherScope.Stats;
 package EtherScope.Display is
 
    B_ETHER : constant UI.Buttons.Button_Index := 1;
@@ -40,14 +41,22 @@ package EtherScope.Display is
 
    package Use_Graph is new UI.Graphs (Value_Type => Net.Uint64,
                                        Graph_Size => 1024);
+   subtype Graph_Type is Use_Graph.Graph_Type;
 
-   B_Graph : Use_Graph.Graph_Type;
+   type Graph_Array is array (EtherScope.Stats.Graph_Kind) of Graph_Type;
+
+   Graphs  : Graph_Array;
 
    --  Initialize the display.
    procedure Initialize;
 
    --  Draw the layout presentation frame.
    procedure Draw_Frame (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+
+   --  Draw the display buttons.
+   procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+
+   procedure Refresh_Graphs (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display devices found on the network.
    procedure Display_Devices (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
