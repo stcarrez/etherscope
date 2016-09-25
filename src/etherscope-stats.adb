@@ -17,16 +17,30 @@
 -----------------------------------------------------------------------
 package body EtherScope.Stats is
 
+   use type Net.Uint32;
+   use type Net.Uint64;
+
    --  ------------------------------
    --  Update the statistics after reception of a packet of the given length.
    --  ------------------------------
    procedure Add (Stats  : in out Statistics;
                   Length : in Net.Uint32) is
-      use type Net.Uint32;
-      use type Net.Uint64;
    begin
       Stats.Packets := Stats.Packets + 1;
       Stats.Bytes   := Stats.Bytes + Net.Uint64 (Length);
+   end Add;
+
+   --  ------------------------------
+   --  Update the statistics after reception of a packet of the given length.
+   --  ------------------------------
+   procedure Add (Samples : in out Graph_Samples;
+                  Kind    : in Graph_Kind;
+                  Stats   : in out Statistics;
+                  Length  : in Net.Uint32) is
+   begin
+      Stats.Packets := Stats.Packets + 1;
+      Stats.Bytes   := Stats.Bytes + Net.Uint64 (Length);
+      Samples (Kind) := Samples (Kind) + Net.Uint64 (Length);
    end Add;
 
 end EtherScope.Stats;
