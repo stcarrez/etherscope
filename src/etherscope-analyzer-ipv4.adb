@@ -92,6 +92,7 @@ package body EtherScope.Analyzer.IPv4 is
       EtherScope.Stats.Update_Rate (Current.IGMP, Previous.IGMP, Dt);
       EtherScope.Stats.Update_Rate (Current.UDP, Previous.UDP, Dt);
       EtherScope.Stats.Update_Rate (Current.TCP, Previous.TCP, Dt);
+      EtherScope.Stats.Update_Rate (Current.UDP, Previous.Unknown, Dt);
    end Update_Rates;
 
 end EtherScope.Analyzer.IPv4;
