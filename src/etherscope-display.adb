@@ -98,7 +98,7 @@ package body EtherScope.Display is
    procedure Draw_Frame (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
       Y : constant Natural := 5;
    begin
-      Buffer.Fill (Current_Background_Color);
+      Buffer.Fill (UI.Texts.Background);
       UI.Buttons.Draw_Buttons (Buffer => Buffer,
                                List   => Buttons,
                                X      => 0,
@@ -194,8 +194,8 @@ package body EtherScope.Display is
             Start      => (200, 240),
             Msg        => Text,
             Font       => BMP_Fonts.Font16x24,
-            Foreground => HAL.Bitmap.White,
-            Background => Current_Background_Color);
+            Foreground => UI.Texts.Foreground,
+            Background => UI.Texts.Background);
    end Print;
 
 end EtherScope.Display;
