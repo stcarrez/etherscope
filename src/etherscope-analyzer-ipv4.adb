@@ -28,6 +28,7 @@ package body EtherScope.Analyzer.IPv4 is
    procedure Analyze (Packet   : in Net.Buffers.Buffer_Type;
                       Device   : in Device_Index;
                       Result   : in out Analysis;
+                      Groups   : in out EtherScope.Analyzer.IGMP.Analysis;
                       Samples  : in out EtherScope.Stats.Graph_Samples) is
       use type Net.Ip_Addr;
 
@@ -49,6 +50,9 @@ package body EtherScope.Analyzer.IPv4 is
          when Net.Protos.IPv4.P_UDP =>
             EtherScope.Stats.Add (Samples, EtherScope.Stats.G_UDP, Result.UDP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).UDP, Length);
+            if Net.Is_Multicast (Ip_Hdr.Ip_Dst) then
+               EtherScope.Analyzer.IGMP.Analyze_Traffic (Packet, Groups);
+            end if;
 
          when Net.Protos.IPv4.P_TCP =>
             EtherScope.Stats.Add (Samples, EtherScope.Stats.G_TCP, Result.TCP, Length);
@@ -61,6 +65,7 @@ package body EtherScope.Analyzer.IPv4 is
          when Net.Protos.IPv4.P_IGMP =>
             EtherScope.Stats.Add (Samples, EtherScope.Stats.G_IGMP, Result.IGMP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).IGMP, Length);
+            EtherScope.Analyzer.IGMP.Analyze (Packet, Groups);
 
          when others =>
             EtherScope.Stats.Add (Result.Unknown, Length);
