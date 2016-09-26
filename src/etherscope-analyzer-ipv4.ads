@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Net.Buffers;
 with EtherScope.Stats;
+with EtherScope.Analyzer.IGMP;
 
 --  === IPv4 Packet Analyzer ===
 --  The IPv4 packet analyzer collects the different IPv4 addresses seen on the
@@ -65,6 +66,7 @@ package EtherScope.Analyzer.IPv4 is
    procedure Analyze (Packet   : in Net.Buffers.Buffer_Type;
                       Device   : in Device_Index;
                       Result   : in out Analysis;
+                      Groups   : in out EtherScope.Analyzer.IGMP.Analysis;
                       Samples  : in out EtherScope.Stats.Graph_Samples);
 
    --  Compute the bandwidth utilization for different devices and protocols.
