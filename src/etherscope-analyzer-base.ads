@@ -19,6 +19,7 @@ with Net.Buffers;
 with EtherScope.Stats;
 with EtherScope.Analyzer.Ethernet;
 with EtherScope.Analyzer.IPv4;
+with EtherScope.Analyzer.IGMP;
 
 --  === Package Analyzer ===
 --  The packet analyzer looks at the received Ethernet packet and applies protocol
@@ -47,6 +48,15 @@ package EtherScope.Analyzer.Base is
       Unknown    : EtherScope.Stats.Statistics;
    end record;
 
+   type Group_Stats is record
+      Groups     : EtherScope.Analyzer.IGMP.Group_Table_Stats;
+      Count      : EtherScope.Stats.Group_Count := 0;
+
+      --  Protocol statistics.
+      IGMP       : EtherScope.Stats.Statistics;
+      UDP        : EtherScope.Stats.Statistics;
+   end record;
+
    --  Analyze the received packet.
    procedure Analyze (Packet : in out Net.Buffers.Buffer_Type);
 
@@ -55,6 +65,9 @@ package EtherScope.Analyzer.Base is
 
    --  Get the protocol statistics.
    procedure Get_Protocols (Into : out Protocol_Stats);
+
+   --  Get the multicast group statistics.
+   procedure Get_Groups (Into : out Group_Stats);
 
    procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
                                    Clear   : in Boolean);
