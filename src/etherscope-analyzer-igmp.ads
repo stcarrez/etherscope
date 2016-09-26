@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  etherscope-analyzer-ipv4 -- IPv4 packet analyzer
+--  etherscope-analyzer-igmp -- IGMP packet analyzer
 --  Copyright (C) 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
