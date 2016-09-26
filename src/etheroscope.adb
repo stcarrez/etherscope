@@ -107,6 +107,9 @@ begin
             when EtherScope.Display.B_IPv4 =>
                EtherScope.Display.Display_Protocols (Buffer);
 
+            when EtherScope.Display.B_IGMP =>
+               EtherScope.Display.Display_Groups (Buffer);
+
             when others =>
                null;
 
@@ -117,7 +120,7 @@ begin
                                    & Natural'Image ((Now - Start) / ONE_SEC));
          STM32.Board.Display.Update_Layer (1);
          Count := Count + 1;
-         delay until Now + Ada.Real_Time.Milliseconds (500);
+         delay until Now + Ada.Real_Time.Milliseconds (100);
       end;
    end loop;
 
