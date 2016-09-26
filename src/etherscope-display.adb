@@ -27,6 +27,7 @@ with UI.Texts;
 with EtherScope.Stats;
 with EtherScope.Analyzer.Ethernet;
 with EtherScope.Analyzer.IPv4;
+with EtherScope.Analyzer.IGMP;
 with EtherScope.Analyzer.Base;
 
 package body EtherScope.Display is
@@ -48,6 +49,7 @@ package body EtherScope.Display is
 
    Devices   : Analyzer.Base.Device_Stats;
    Protocols : Analyzer.Base.Protocol_Stats;
+   Groups    : Analyzer.Base.Group_Stats;
 
    --  Convert the integer to a string without a leading space.
    function Image (Value : in Net.Uint32) return String is
@@ -197,7 +199,7 @@ package body EtherScope.Display is
       use EtherScope.Analyzer.Base;
       use UI.Texts;
 
-      Y      : Natural := 15;
+      Y      : Natural := 0;
 
       procedure Display_Protocol (Name : in String;
                                   Stat : in EtherScope.Stats.Statistics) is
@@ -208,7 +210,7 @@ package body EtherScope.Display is
          UI.Texts.Draw_String (Buffer, (350, Y), 100, Format_Bandwidth (Stat.Bandwidth), RIGHT);
          Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
                                       X     => 100,
-                                      Y     => Y + 28,
+                                      Y     => Y + 25,
                                       Width => Buffer.Width - 100);
          Y := Y + 30;
       end Display_Protocol;
@@ -226,14 +228,69 @@ package body EtherScope.Display is
       UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
       UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
       UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
-      Y := Y + 30;
+      Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.Blue,
+                                   X     => 100,
+                                   Y     => Y + 14,
+                                   Width => Buffer.Width - 100);
+      Y := Y + 16;
 
+      UI.Texts.Foreground := HAL.Bitmap.Green;
       Display_Protocol ("ICMP", Protocols.ICMP);
       Display_Protocol ("IGMP", Protocols.IGMP);
       Display_Protocol ("UDP", Protocols.UDP);
       Display_Protocol ("TCP", Protocols.TCP);
+
       Display_Protocol ("Others", Protocols.Unknown);
+      UI.Texts.Foreground := HAL.Bitmap.White;
    end Display_Protocols;
+
+   --  ------------------------------
+   --  Display IGMP groups found on the network.
+   --  ------------------------------
+   procedure Display_Groups (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+      use EtherScope.Analyzer.Base;
+      use UI.Texts;
+
+      Y : Natural := 0;
+
+      procedure Display_Group (Group : in EtherScope.Analyzer.IGMP.Group_Stats) is
+      begin
+         UI.Texts.Draw_String (Buffer, (105, Y), 175, Net.Utils.To_String (Group.Ip));
+         UI.Texts.Draw_String (Buffer, (180, Y + 30), 100, Format_Packets (Group.UDP.Packets), RIGHT);
+         UI.Texts.Draw_String (Buffer, (280, Y + 30), 100, Format_Bytes (Group.UDP.Bytes), RIGHT);
+         UI.Texts.Draw_String (Buffer, (380, Y), 100, Format_Bandwidth (Group.UDP.Bandwidth), RIGHT);
+         Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
+                                      X     => 100,
+                                      Y     => Y + 58,
+                                      Width => Buffer.Width - 100);
+         Y := Y + 60;
+      end Display_Group;
+
+   begin
+      EtherScope.Analyzer.Base.Get_Groups (Groups);
+      Buffer.Fill_Rect (Color  => UI.Texts.Background,
+                        X      => 100,
+                        Y      => 0,
+                        Width  => Buffer.Width - 100,
+                        Height => Buffer.Height);
+
+      --  Draw some column header.
+      UI.Texts.Draw_String (Buffer, (105, Y), 175, "IP");
+      UI.Texts.Draw_String (Buffer, (180, Y), 100, "Packets", RIGHT);
+      UI.Texts.Draw_String (Buffer, (280, Y), 100, "Bytes", RIGHT);
+      UI.Texts.Draw_String (Buffer, (380, Y), 100, "Bandwidth", RIGHT);
+      Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
+                                   X     => 100,
+                                   Y     => Y + 14,
+                                   Width => Buffer.Width - 100);
+      Y := Y + 16;
+
+      UI.Texts.Foreground := HAL.Bitmap.Green;
+      for I in 1 .. Groups.Count loop
+         Display_Group (Groups.Groups (I));
+      end loop;
+      UI.Texts.Foreground := HAL.Bitmap.White;
+   end Display_Groups;
 
    procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                     Text   : in String) is
