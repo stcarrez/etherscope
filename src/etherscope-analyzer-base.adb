@@ -30,6 +30,7 @@ package body EtherScope.Analyzer.Base is
    protected DB is
       procedure Get_Devices (Devices : out Device_Stats);
       procedure Get_Protocols (Protocols : out Protocol_Stats);
+      procedure Get_Groups (Groups : out Group_Stats);
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
                                       Clear  : in Boolean);
 
@@ -51,8 +52,12 @@ package body EtherScope.Analyzer.Base is
       IPv4          : EtherScope.Analyzer.IPv4.Analysis;
       Prev_IPv4     : EtherScope.Analyzer.IPv4.Analysis;
 
+      --  IGMP group analysis.
+      IGMP_Groups   : EtherScope.Analyzer.IGMP.Analysis;
+      Prev_Groups   : EtherScope.Analyzer.IGMP.Analysis;
+
       --  Pending samples for the graphs.
-      Samples   : EtherScope.Stats.Graph_Samples;
+      Samples       : EtherScope.Stats.Graph_Samples;
    end DB;
 
    ONE_MS : constant Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (1);
@@ -69,6 +74,7 @@ package body EtherScope.Analyzer.Base is
             begin
                EtherScope.Analyzer.Ethernet.Update_Rates (Ethernet, Prev_Ethernet, MS);
                EtherScope.Analyzer.IPv4.Update_Rates (IPv4, Prev_IPv4, MS);
+               EtherScope.Analyzer.IGMP.Update_Rates (IGMP_Groups, Prev_Groups, MS);
                Prev_Time := Now;
                Deadline := Deadline + Ada.Real_Time.Seconds (10);
             end;
@@ -93,6 +99,15 @@ package body EtherScope.Analyzer.Base is
          Protocols.Unknown := IPv4.Unknown;
       end Get_Protocols;
 
+      procedure Get_Groups (Groups : out Group_Stats) is
+      begin
+         Update_Rates;
+         Groups.Groups := IGMP_Groups.Groups;
+         Groups.Count  := IGMP_Groups.Count;
+         Groups.IGMP   := IPv4.IGMP;
+         Groups.UDP    := IPv4.UDP;
+      end Get_Groups;
+
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
                                       Clear  : in Boolean) is
       begin
@@ -114,7 +129,7 @@ package body EtherScope.Analyzer.Base is
       procedure Analyze_IPv4 (Packet : in out Net.Buffers.Buffer_Type;
                               Device : in EtherScope.Stats.Device_Index) is
       begin
-         EtherScope.Analyzer.IPv4.Analyze (Packet, Device, IPv4, Samples);
+         EtherScope.Analyzer.IPv4.Analyze (Packet, Device, IPv4, IGMP_Groups, Samples);
       end Analyze_IPv4;
 
    end DB;
@@ -158,6 +173,14 @@ package body EtherScope.Analyzer.Base is
    begin
       DB.Get_Protocols (Into);
    end Get_Protocols;
+
+   --  ------------------------------
+   --  Get the multicast group statistics.
+   --  ------------------------------
+   procedure Get_Groups (Into : out Group_Stats) is
+   begin
+      DB.Get_Groups (Into);
+   end Get_Groups;
 
    procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
                                    Clear   : in Boolean) is
