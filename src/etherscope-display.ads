@@ -24,19 +24,22 @@ with UI.Graphs;
 with EtherScope.Stats;
 package EtherScope.Display is
 
+   --  Color to draw a separation line.
+   Line_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
+
    B_ETHER : constant UI.Buttons.Button_Index := 1;
    B_IPv4  : constant UI.Buttons.Button_Index := 2;
    B_IGMP  : constant UI.Buttons.Button_Index := 3;
-   B_ICMP  : constant UI.Buttons.Button_Index := 4;
-   B_UDP   : constant UI.Buttons.Button_Index := 5;
-   B_TCP   : constant UI.Buttons.Button_Index := 6;
+   --  B_ICMP  : constant UI.Buttons.Button_Index := 4;
+   --  B_UDP   : constant UI.Buttons.Button_Index := 5;
+   B_TCP   : constant UI.Buttons.Button_Index := 4;
 
    Buttons : UI.Buttons.Button_Array (B_ETHER .. B_TCP) :=
      (B_ETHER => (Name => "Ether", State => UI.Buttons.B_PRESSED, others => <>),
       B_IPv4  => (Name => "IPv4 ", others => <>),
-      B_ICMP  => (Name => "ICMP ", others => <>),
+      --  B_ICMP  => (Name => "ICMP ", others => <>),
       B_IGMP  => (Name => "IGMP ", others => <>),
-      B_UDP   => (Name => "UDP  ", others => <>),
+      --  B_UDP   => (Name => "UDP  ", others => <>),
       B_TCP   => (Name => "TCP  ", others => <>));
 
    package Use_Graph is new UI.Graphs (Value_Type => Net.Uint64,
@@ -63,6 +66,9 @@ package EtherScope.Display is
 
    --  Display devices found on the network.
    procedure Display_Protocols (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+
+   --  Display TCP/IP information found on the network.
+   procedure Display_TCP (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display IGMP groups found on the network.
    procedure Display_Groups (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
