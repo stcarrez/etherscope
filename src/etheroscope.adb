@@ -41,6 +41,8 @@ procedure Etheroscope with Priority => System.Priority'First is
 
    use type Interfaces.Unsigned_32;
    use type UI.Buttons.Button_Index;
+   use type Ada.Real_Time.Time;
+   use type Ada.Real_Time.Time_Span;
 
    Count  : Natural := 0;
    Mode   : UI.Buttons.Button_Event := EtherScope.Display.B_ETHER;
@@ -48,8 +50,10 @@ procedure Etheroscope with Priority => System.Priority'First is
    --  Reserve 32 network buffers.
    NET_BUFFER_SIZE : constant Interfaces.Unsigned_32 := Net.Buffers.NET_ALLOC_SIZE * 32;
    ONE_SEC : Ada.Real_Time.Time_Span := Ada.Real_Time.Seconds (1);
-   Button_Changed : Boolean := False;
+   REFRESH_PERIOD   : constant Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (500);
+   Button_Changed   : Boolean := False;
    Start   : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
+   Refresh_Deadline : Ada.Real_Time.Time;
 begin
    STM32.RNG.Interrupts.Initialize_RNG;
    STM32.Button.Initialize;
@@ -71,11 +75,11 @@ begin
    Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => NET_BUFFER_SIZE), NET_BUFFER_SIZE);
    EtherScope.Receiver.Ifnet.Initialize;
 
+   Refresh_Deadline := Ada.Real_Time.Clock + REFRESH_PERIOD;
+
    --  Loop to retrieve the analysis and display them.
    loop
       declare
-         use type Ada.Real_Time.Time_Span;
-
          Action  : UI.Buttons.Button_Event;
          Now     : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
          Buffer  : constant HAL.Bitmap.Bitmap_Buffer'Class := STM32.Board.Display.Get_Hidden_Buffer (1);
@@ -87,6 +91,7 @@ begin
             Button_Changed := False;
          end if;
 
+         --  Check for a button being pressed.
          UI.Buttons.Get_Event (Buffer => Buffer,
                                Touch  => STM32.Board.Touch_Panel,
                                List   => EtherScope.Display.Buttons,
@@ -100,26 +105,34 @@ begin
                EtherScope.Display.Draw_Buttons (Buffer);
             end if;
          end if;
-         case Mode is
-            when EtherScope.Display.B_ETHER =>
-               EtherScope.Display.Display_Devices (Buffer);
 
-            when EtherScope.Display.B_IPv4 =>
-               EtherScope.Display.Display_Protocols (Buffer);
+         --  Refresh the display only every 500 ms or when the display state is changed.
+         if Refresh_Deadline <= Now or Button_Changed then
+            case Mode is
+               when EtherScope.Display.B_ETHER =>
+                  EtherScope.Display.Display_Devices (Buffer);
 
-            when EtherScope.Display.B_IGMP =>
-               EtherScope.Display.Display_Groups (Buffer);
+               when EtherScope.Display.B_IPv4 =>
+                  EtherScope.Display.Display_Protocols (Buffer);
 
-            when others =>
-               null;
+               when EtherScope.Display.B_IGMP =>
+                  EtherScope.Display.Display_Groups (Buffer);
 
-         end case;
-         EtherScope.Display.Refresh_Graphs (Buffer);
-         EtherScope.Display.Display_Summary (Buffer);
-         EtherScope.Display.Print (Buffer => Buffer,
-                                   Text   => Natural'Image (Count) & " "
-                                   & Natural'Image ((Now - Start) / ONE_SEC));
-         STM32.Board.Display.Update_Layer (1);
+               when EtherScope.Display.B_TCP =>
+                  EtherScope.Display.Display_TCP (Buffer);
+
+               when others =>
+                  null;
+
+            end case;
+            EtherScope.Display.Refresh_Graphs (Buffer);
+            EtherScope.Display.Display_Summary (Buffer);
+            EtherScope.Display.Print (Buffer => Buffer,
+                                      Text   => Natural'Image (Count) & " "
+                                      & Natural'Image ((Now - Start) / ONE_SEC));
+            STM32.Board.Display.Update_Layer (1);
+            Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
+         end if;
          Count := Count + 1;
          delay until Now + Ada.Real_Time.Milliseconds (100);
       end;
