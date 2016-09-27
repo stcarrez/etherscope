@@ -16,6 +16,14 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+--  == EtherScope Analyzer ==
+--  The packet analysis is split in different parts depending on the protocol
+--  identified on the packet.
+--
+--  @include etherscope-analyzer-base.ads
+--  @include etherscope-analyzer-ethernet.ads
+--  @include etherscope-analyzer-ipv4.ads
+--  @include etherscope-analyzer-igmp.ads
 package EtherScope.Analyzer is
 
 end EtherScope.Analyzer;
