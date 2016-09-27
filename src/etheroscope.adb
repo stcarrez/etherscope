@@ -115,6 +115,7 @@ begin
 
          end case;
          EtherScope.Display.Refresh_Graphs (Buffer);
+         EtherScope.Display.Display_Summary (Buffer);
          EtherScope.Display.Print (Buffer => Buffer,
                                    Text   => Natural'Image (Count) & " "
                                    & Natural'Image ((Now - Start) / ONE_SEC));
