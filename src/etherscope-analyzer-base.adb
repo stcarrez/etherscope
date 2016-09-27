@@ -31,6 +31,7 @@ package body EtherScope.Analyzer.Base is
       procedure Get_Devices (Devices : out Device_Stats);
       procedure Get_Protocols (Protocols : out Protocol_Stats);
       procedure Get_Groups (Groups : out Group_Stats);
+      procedure Get_TCP (Ports : out TCP_Stats);
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
                                       Clear  : in Boolean);
 
@@ -56,6 +57,10 @@ package body EtherScope.Analyzer.Base is
       IGMP_Groups   : EtherScope.Analyzer.IGMP.Analysis;
       Prev_Groups   : EtherScope.Analyzer.IGMP.Analysis;
 
+      --  TCP/IP analysis.
+      TCP_Ports     : EtherScope.Analyzer.TCP.Analysis;
+      Prev_TCP      : EtherScope.Analyzer.TCP.Analysis;
+
       --  Pending samples for the graphs.
       Samples       : EtherScope.Stats.Graph_Samples;
    end DB;
@@ -75,6 +80,7 @@ package body EtherScope.Analyzer.Base is
                EtherScope.Analyzer.Ethernet.Update_Rates (Ethernet, Prev_Ethernet, MS);
                EtherScope.Analyzer.IPv4.Update_Rates (IPv4, Prev_IPv4, MS);
                EtherScope.Analyzer.IGMP.Update_Rates (IGMP_Groups, Prev_Groups, MS);
+               EtherScope.Analyzer.TCP.Update_Rates (TCP_Ports, Prev_TCP, MS);
                Prev_Time := Now;
                Deadline := Deadline + Ada.Real_Time.Seconds (1);
             end;
@@ -108,6 +114,12 @@ package body EtherScope.Analyzer.Base is
          Groups.IGMP   := IPv4.IGMP;
          Groups.UDP    := IPv4.UDP;
       end Get_Groups;
+
+      procedure Get_TCP (Ports : out TCP_Stats) is
+      begin
+         Update_Rates;
+         Ports.Ports := TCP_Ports.Ports;
+      end Get_TCP;
 
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
                                       Clear  : in Boolean) is
@@ -182,6 +194,14 @@ package body EtherScope.Analyzer.Base is
    begin
       DB.Get_Groups (Into);
    end Get_Groups;
+
+   --  ------------------------------
+   --  Get the TCP/IP information statistics.
+   --  ------------------------------
+   procedure Get_TCP (Into : out TCP_Stats) is
+   begin
+      DB.Get_TCP (Into);
+   end Get_TCP;
 
    procedure Update_Graph_Samples (Samples : out EtherScope.Stats.Graph_Samples;
                                    Clear   : in Boolean) is
