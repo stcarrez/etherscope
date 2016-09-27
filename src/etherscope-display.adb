@@ -29,6 +29,7 @@ with EtherScope.Analyzer.Ethernet;
 with EtherScope.Analyzer.IPv4;
 with EtherScope.Analyzer.IGMP;
 with EtherScope.Analyzer.Base;
+with EtherScope.Receiver;
 
 package body EtherScope.Display is
 
@@ -144,7 +145,7 @@ package body EtherScope.Display is
                                X      => 0,
                                Y      => 0,
                                Width  => 100,
-                               Height => 30);
+                               Height => 34);
    end Draw_Buttons;
 
    procedure Refresh_Graphs (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
@@ -189,6 +190,7 @@ package body EtherScope.Display is
                                       Y     => Y + 49,
                                       Width => Buffer.Width - 100);
          Y := Y + 50;
+         exit when Y + 60 >= Buffer.Height;
       end loop;
    end Display_Devices;
 
@@ -288,6 +290,7 @@ package body EtherScope.Display is
       UI.Texts.Foreground := HAL.Bitmap.Green;
       for I in 1 .. Groups.Count loop
          Display_Group (Groups.Groups (I));
+         exit when Y + 60 >= Buffer.Height;
       end loop;
       UI.Texts.Foreground := HAL.Bitmap.White;
    end Display_Groups;
@@ -303,5 +306,46 @@ package body EtherScope.Display is
             Foreground => UI.Texts.Foreground,
             Background => UI.Texts.Background);
    end Print;
+
+   use Ada.Real_Time;
+   Prev_Time : Ada.Real_Time.Time := Ada.Real_Time.Clock;
+   Deadline  : Ada.Real_Time.Time := Prev_Time + Ada.Real_Time.Seconds (1);
+   Speed      : Natural := 0;
+   Pkts       : Net.Uint32 := 0;
+   ONE_MS : constant Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (1);
+
+   --  Display a performance summary indicator.
+   procedure Display_Summary (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+      Now : Ada.Real_Time.Time := Ada.Real_Time.Clock;
+      V   : Net.Uint32;
+      D   : Integer;
+      C   : Integer;
+   begin
+      if Deadline < Now then
+         V := EtherScope.Receiver.Ifnet.Rx_Stats.Packets;
+         C := (Now - Prev_Time) / ONE_MS;
+         D := Integer (V - Pkts);
+         Speed := (D * 1000) / C;
+         Prev_Time := Now;
+         Deadline := Deadline + Ada.Real_Time.Seconds (1);
+         Pkts := V;
+      end if;
+      Bitmapped_Drawing.Draw_String
+           (Buffer,
+            Start      => (6, 240),
+            Msg        => Integer'Image (Speed),
+            Font       => BMP_Fonts.Font16x24,
+            Foreground => UI.Texts.Foreground,
+            Background => UI.Texts.Background);
+--        Bitmapped_Drawing.Draw_String
+--          (Buffer,
+--           Start      => (X => 6, Y => 200),
+--           Msg        => Net.Uint64'Image (EtherScope.Analyzer.Base.Delta_Bytes) & " "
+--           & Integer'Image (EtherScope.Analyzer.Base.Delta_Time),
+--           Font       => BMP_Fonts.Font16x24,
+--           Foreground => UI.Texts.Foreground,
+--           Background => UI.Texts.Background);
+
+   end Display_Summary;
 
 end EtherScope.Display;
