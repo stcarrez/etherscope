@@ -22,11 +22,11 @@ package UI.Buttons is
 
    --  Button colors (inactive).
    Foreground        : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
-   Background        : HAL.Bitmap.Bitmap_Color := (255, 201, 195, 190);
+   Background        : HAL.Bitmap.Bitmap_Color := (255, 227, 227, 227);
 
    --  Button colors (active).
    Active_Foreground : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
-   Active_Background : HAL.Bitmap.Bitmap_Color := (255, 227, 227, 227);
+   Active_Background : HAL.Bitmap.Bitmap_Color := (255, 201, 195, 190);
 
    type Button_State is (B_PRESSED, B_RELEASED, B_DISABLED);
 
