@@ -38,5 +38,25 @@ Then, flash the image with:
 
   st-flash write etherscope.bin 0x8000000
 
+# Using EtherScope
+
+To look at the network traffic, it is recommended to have a switch that supports
+port monitoring.  The switch is configured to monitor all the traffic to a given
+port.  The EtherScope is then connected to that port and it will receive all the
+traffic, including the packets not destined to the board.
+
+You can still use EtherScope without a switch and port mirroring but the EtherScope
+will not be able to see all the network packets.  Without port mirroring, we can
+only see multicast and broadcast traffic, which means: ARP, ICMP, IGMP and UDP
+packets on multicast groups.
+
+Once powered up, the EtherScope starts the analysis and offers 4 buttons to
+switch to different display modes:
+
+* <b>Ether</b> displays the list of devices found on the network.
+* <b>IPv4</b> displays the different IPv4 protocols found on the network.
+* <b>IGMP</b> displays the UDP multicast groups which are subscribed on the network.
+* <b>TCP</b> displays the list of high level application protocols (http, https, ssh, ...).
+
 
 
