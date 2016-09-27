@@ -55,6 +55,7 @@ package EtherScope.Analyzer.Ethernet is
       Dev_Count : EtherScope.Stats.Device_Count := 0;
       Protocols : Protocol_Table_Stats;
       Pro_Count : EtherScope.Stats.Device_Count := 0;
+      Global    : EtherScope.Stats.Statistics;
    end record;
 
    --  Analyze the packet and update the analysis.
