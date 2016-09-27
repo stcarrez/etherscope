@@ -59,4 +59,7 @@ switch to different display modes:
 * <b>TCP</b> displays the list of high level application protocols (http, https, ssh, ...).
 
 
+The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
+
+![](images/etherscope-igmp.png)
 
