@@ -33,8 +33,23 @@ package body UI.Buttons is
                         Y      => Button.Pos.Y + 1,
                         Width  => Button.Width - 2,
                         Height => Button.Height - 2);
+      if Button.State = B_PRESSED then
+         Buffer.Draw_Rect (Color  => HAL.Bitmap.Grey,
+                           X      => Button.Pos.X + 3,
+                           Y      => Button.Pos.Y + 3,
+                           Width  => Button.Width - 5,
+                           Height => Button.Height - 6);
+         Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.Light_Grey,
+                                      X     => Button.Pos.X + 2,
+                                      Y     => Button.Pos.Y + 2,
+                                      Width => Button.Width - 4);
+         Buffer.Draw_Vertical_Line (Color  => HAL.Bitmap.Light_Grey,
+                                    X      => Button.Pos.X + 2,
+                                    Y      => Button.Pos.Y + 2,
+                                    Height => Button.Height - 4);
+      end if;
       Bitmapped_Drawing.Draw_String (Buffer,
-                                     Start      => (Button.Pos.X + 2, Button.Pos.Y + 2),
+                                     Start      => (Button.Pos.X + 4, Button.Pos.Y + 4),
                                      Msg        => Button.Name,
                                      Font       => Bmp_Fonts.Font16x24,
                                      Foreground => Foreground,
