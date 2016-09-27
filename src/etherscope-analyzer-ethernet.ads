@@ -23,12 +23,16 @@ with EtherScope.Stats;
 --  and different Ethernet types seen in the Ethernet header.  The information
 --  is collected in two different tables:
 --
---  o A device table keeps a list of devices seen on the network.
---  o A protocol table keeps a list of Ethernet protocols.
+--  * A device table keeps a list of devices seen on the network.
+--  * A protocol table keeps a list of Ethernet protocols.
 --
 --  Both tables have fixed sizes to avoid dynamic memory allocation.
 --  New entries are filled in the tables until all the entries are used.
 --  The last table entry is used to collect everything that does not fit.
+--
+--  The Ethernet packet analyzer computes a device index based on the Ethernet
+--  source address.  This device index can be used by other protocol analyzers
+--  to easily populate their device analysis.
 package EtherScope.Analyzer.Ethernet is
 
    subtype Device_Index is EtherScope.Stats.Device_Index;
