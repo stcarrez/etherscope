@@ -73,9 +73,6 @@ package EtherScope.Display is
    --  Display IGMP groups found on the network.
    procedure Display_Groups (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
-   procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
-                    Text   : in String);
-
    --  Display a performance summary indicator.
    procedure Display_Summary (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
