@@ -67,7 +67,7 @@ package body EtherScope.Analyzer.Base is
       procedure Update_Rates is
          Now : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
       begin
-         if Now > Deadline then
+         if Deadline < Now then
             declare
                Dt  : constant Ada.Real_Time.Time_Span := Now - Prev_Time;
                MS  : constant Integer := Dt / ONE_MS;
@@ -76,7 +76,7 @@ package body EtherScope.Analyzer.Base is
                EtherScope.Analyzer.IPv4.Update_Rates (IPv4, Prev_IPv4, MS);
                EtherScope.Analyzer.IGMP.Update_Rates (IGMP_Groups, Prev_Groups, MS);
                Prev_Time := Now;
-               Deadline := Deadline + Ada.Real_Time.Seconds (10);
+               Deadline := Deadline + Ada.Real_Time.Seconds (1);
             end;
          end if;
       end Update_Rates;
@@ -92,6 +92,7 @@ package body EtherScope.Analyzer.Base is
       procedure Get_Protocols (Protocols : out Protocol_Stats) is
       begin
          Update_Rates;
+         Protocols.Ethernet := Ethernet.Global;
          Protocols.ICMP := IPv4.ICMP;
          Protocols.IGMP := IPv4.IGMP;
          Protocols.UDP  := IPv4.UDP;
