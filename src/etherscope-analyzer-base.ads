@@ -41,6 +41,7 @@ package EtherScope.Analyzer.Base is
       Count     : EtherScope.Stats.Protocol_Count := 0;
 
       --  Global ICMP, IGMP, UDP, TCP statistics.
+      Ethernet   : EtherScope.Stats.Statistics;
       ICMP       : EtherScope.Stats.Statistics;
       IGMP       : EtherScope.Stats.Statistics;
       UDP        : EtherScope.Stats.Statistics;
