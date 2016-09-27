@@ -1,5 +1,6 @@
 # Ethernet Traffic Monitor on a STM32F746
 
+[![Build Status](https://img.shields.io/jenkins/s/http/jenkins.vacs.fr/etherscope.svg)](http://jenkins.vacs.fr/job/etherscope/)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
 
 EtherScope is a monitoring tool that analyzes the Ethernet traffic.
@@ -19,7 +20,10 @@ The EtherScope uses the following two GitHub projects:
 * Ada Embedded Network  https://github.com/stcarrez/ada-enet.git
 
 You need the source of these two projects to buid EtherScope.
-Sources must be available in the parent directory (that is '..').
+To help, these GitHub projects are registered as Git submodules and
+the Makefile provides a target to perform the checkout.  Just run:
+
+  make checkout
 
 You will also need the GNAT Ada compiler for ARM available at http://libre.adacore.com/
 
