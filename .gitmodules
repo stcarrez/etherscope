@@ -1,0 +1,6 @@
+[submodule "ada-enet"]
+	path = ada-enet
+	url = git://github.com/stcarrez/ada-enet.git
+[submodule "Ada_Drivers_Library"]
+	path = Ada_Drivers_Library
+	url = git://github.com/AdaCore/Ada_Drivers_Library.git
