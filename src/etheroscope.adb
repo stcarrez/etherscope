@@ -44,16 +44,18 @@ procedure Etheroscope with Priority => System.Priority'First is
    use type Ada.Real_Time.Time;
    use type Ada.Real_Time.Time_Span;
 
-   Count  : Natural := 0;
-   Mode   : UI.Buttons.Button_Event := EtherScope.Display.B_ETHER;
-
    --  Reserve 32 network buffers.
-   NET_BUFFER_SIZE : constant Interfaces.Unsigned_32 := Net.Buffers.NET_ALLOC_SIZE * 32;
-   ONE_SEC : Ada.Real_Time.Time_Span := Ada.Real_Time.Seconds (1);
+   NET_BUFFER_SIZE  : constant Interfaces.Unsigned_32 := Net.Buffers.NET_ALLOC_SIZE * 32;
+
+   --  Display refresh period.
    REFRESH_PERIOD   : constant Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (500);
-   Button_Changed   : Boolean := False;
-   Start   : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
+
+   --  Display refresh deadline.
    Refresh_Deadline : Ada.Real_Time.Time;
+
+   --  Current display mode.
+   Mode             : UI.Buttons.Button_Event := EtherScope.Display.B_ETHER;
+   Button_Changed   : Boolean := False;
 begin
    STM32.RNG.Interrupts.Initialize_RNG;
    STM32.Button.Initialize;
@@ -70,8 +72,11 @@ begin
    --  Static IP interface, default netmask and no gateway.
    --  (In fact, this is not really necessary for using the receiver in promiscus mode)
    EtherScope.Receiver.Ifnet.Ip := (192, 168, 1, 1);
-   EtherScope.Receiver.Ifnet.Mac := (0, 16#81#, 16#E1#, 5, 5, 1); --  STMicroelectronics OUI = 00 81 E1
 
+   --  STMicroelectronics OUI = 00 81 E1
+   EtherScope.Receiver.Ifnet.Mac := (0, 16#81#, 16#E1#, 5, 5, 1);
+
+   --  Setup some receive buffers and initialize the Ethernet driver.
    Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => NET_BUFFER_SIZE), NET_BUFFER_SIZE);
    EtherScope.Receiver.Ifnet.Initialize;
 
@@ -127,13 +132,9 @@ begin
             end case;
             EtherScope.Display.Refresh_Graphs (Buffer);
             EtherScope.Display.Display_Summary (Buffer);
-            EtherScope.Display.Print (Buffer => Buffer,
-                                      Text   => Natural'Image (Count) & " "
-                                      & Natural'Image ((Now - Start) / ONE_SEC));
             STM32.Board.Display.Update_Layer (1);
             Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
          end if;
-         Count := Count + 1;
          delay until Now + Ada.Real_Time.Milliseconds (100);
       end;
    end loop;
