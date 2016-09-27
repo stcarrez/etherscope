@@ -8,3 +8,8 @@ etherscope:
 
 flash:		all
 	st-flash write etherscope.bin 0x8000000
+
+checkout:
+	git submodule init
+	git submodule update
+	cd Ada_Drivers_Library && git submodule init && git submodule update
