@@ -33,6 +33,8 @@ package body EtherScope.Analyzer.Ethernet is
       use type Net.Ether_Addr;
       Found : Boolean := False;
    begin
+      EtherScope.Stats.Add (Result.Global, Net.Uint32 (Length));
+
       --  Collect information by device/Ethernet address.
       for I in 1 .. Result.Dev_Count loop
          if Result.Devices (I).Mac = Ether.Ether_Shost then
