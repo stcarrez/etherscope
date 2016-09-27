@@ -32,7 +32,7 @@ package EtherScope.Display is
    B_TCP   : constant UI.Buttons.Button_Index := 6;
 
    Buttons : UI.Buttons.Button_Array (B_ETHER .. B_TCP) :=
-     (B_ETHER => (Name => "Ether", others => <>),
+     (B_ETHER => (Name => "Ether", State => UI.Buttons.B_PRESSED, others => <>),
       B_IPv4  => (Name => "IPv4 ", others => <>),
       B_ICMP  => (Name => "ICMP ", others => <>),
       B_IGMP  => (Name => "IGMP ", others => <>),
@@ -69,5 +69,8 @@ package EtherScope.Display is
 
    procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
                     Text   : in String);
+
+   --  Display a performance summary indicator.
+   procedure Display_Summary (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
 end EtherScope.Display;
