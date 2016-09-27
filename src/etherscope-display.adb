@@ -35,6 +35,8 @@ package body EtherScope.Display is
 
    use type Interfaces.Unsigned_32;
    use type Interfaces.Unsigned_64;
+   use UI.Texts;
+   use type Net.Uint16;
 
    --  Convert the integer to a string without a leading space.
    function Image (Value : in Net.Uint32) return String;
@@ -122,7 +124,6 @@ package body EtherScope.Display is
    --  Draw the layout presentation frame.
    --  ------------------------------
    procedure Draw_Frame (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
-      Y : constant Natural := 5;
    begin
       Buffer.Fill (UI.Texts.Background);
       Draw_Buttons (Buffer);
@@ -130,10 +131,6 @@ package body EtherScope.Display is
                                  X      => 98,
                                  Y      => 0,
                                  Height => Buffer.Height);
---        Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.White_Smoke,
---                                     X     => 0,
---                                     Y     => Y,
---                                     Width => 480);
    end Draw_Frame;
 
    --  ------------------------------
@@ -165,7 +162,6 @@ package body EtherScope.Display is
    --  ------------------------------
    procedure Display_Devices (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
-      use UI.Texts;
 
       Y      : Natural := 15;
    begin
@@ -200,7 +196,8 @@ package body EtherScope.Display is
    --  ------------------------------
    procedure Display_Protocols (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
-      use UI.Texts;
+      procedure Display_Protocol (Name : in String;
+                                  Stat : in EtherScope.Stats.Statistics);
 
       Y      : Natural := 0;
 
@@ -252,7 +249,7 @@ package body EtherScope.Display is
    --  ------------------------------
    procedure Display_Groups (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
-      use UI.Texts;
+      procedure Display_Group (Group : in EtherScope.Analyzer.IGMP.Group_Stats);
 
       Y : Natural := 0;
 
@@ -301,8 +298,7 @@ package body EtherScope.Display is
    --  ------------------------------
    procedure Display_TCP (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
-      use UI.Texts;
-      use type Net.Uint16;
+      procedure Display_Port (Port : in EtherScope.Analyzer.TCP.TCP_Stats);
 
       Y : Natural := 0;
 
@@ -357,57 +353,53 @@ package body EtherScope.Display is
       UI.Texts.Foreground := HAL.Bitmap.White;
    end Display_TCP;
 
-   procedure Print (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
-                    Text   : in String) is
-   begin
-      Bitmapped_Drawing.Draw_String
-           (Buffer,
-            Start      => (200, 240),
-            Msg        => Text,
-            Font       => BMP_Fonts.Font16x24,
-            Foreground => UI.Texts.Foreground,
-            Background => UI.Texts.Background);
-   end Print;
-
    use Ada.Real_Time;
    Prev_Time : Ada.Real_Time.Time := Ada.Real_Time.Clock;
    Deadline  : Ada.Real_Time.Time := Prev_Time + Ada.Real_Time.Seconds (1);
    Speed      : Natural := 0;
+   Bandwidth  : Natural := 0;
    Pkts       : Net.Uint32 := 0;
+   Bytes      : Net.Uint64 := 0;
    ONE_MS : constant Ada.Real_Time.Time_Span := Ada.Real_Time.Milliseconds (1);
 
+   --  ------------------------------
    --  Display a performance summary indicator.
+   --  ------------------------------
    procedure Display_Summary (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
-      Now : Ada.Real_Time.Time := Ada.Real_Time.Clock;
-      V   : Net.Uint32;
-      D   : Integer;
-      C   : Integer;
+      Now       : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
+      Cur_Pkts  : Net.Uint32;
+      Cur_Bytes : Net.Uint64;
+      D         : Integer;
+      C         : Integer;
    begin
       if Deadline < Now then
-         V := EtherScope.Receiver.Ifnet.Rx_Stats.Packets;
+         Cur_Bytes := EtherScope.Receiver.Ifnet.Rx_Stats.Bytes;
+         Cur_Pkts  := EtherScope.Receiver.Ifnet.Rx_Stats.Packets;
          C := (Now - Prev_Time) / ONE_MS;
-         D := Integer (V - Pkts);
+         D := Integer (Cur_Pkts - Pkts);
          Speed := (D * 1000) / C;
+         Bandwidth := Natural (((Cur_Bytes - Bytes) * 8000) / Net.Uint64 (C));
          Prev_Time := Now;
          Deadline := Deadline + Ada.Real_Time.Seconds (1);
-         Pkts := V;
+         Pkts := Cur_Pkts;
+         Bytes := Cur_Bytes;
       end if;
+
       Bitmapped_Drawing.Draw_String
            (Buffer,
-            Start      => (6, 240),
-            Msg        => Integer'Image (Speed),
+            Start      => (30, 240),
+            Msg        => Integer'Image (Speed) & " pkts/s",
             Font       => BMP_Fonts.Font16x24,
             Foreground => UI.Texts.Foreground,
             Background => UI.Texts.Background);
---        Bitmapped_Drawing.Draw_String
---          (Buffer,
---           Start      => (X => 6, Y => 200),
---           Msg        => Net.Uint64'Image (EtherScope.Analyzer.Base.Delta_Bytes) & " "
---           & Integer'Image (EtherScope.Analyzer.Base.Delta_Time),
---           Font       => BMP_Fonts.Font16x24,
---           Foreground => UI.Texts.Foreground,
---           Background => UI.Texts.Background);
 
+      Bitmapped_Drawing.Draw_String
+           (Buffer,
+            Start      => (250, 240),
+            Msg        => Format_Bandwidth (Interfaces.Unsigned_32 (Bandwidth)),
+            Font       => BMP_Fonts.Font16x24,
+            Foreground => UI.Texts.Foreground,
+            Background => UI.Texts.Background);
    end Display_Summary;
 
 end EtherScope.Display;
