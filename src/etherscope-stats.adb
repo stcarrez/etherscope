@@ -51,10 +51,10 @@ package body EtherScope.Stats is
    procedure Update_Rate (Current  : in out Statistics;
                           Previous : in out Statistics;
                           Dt       : in Positive) is
-      D : constant Net.Uint32 := Net.Uint32 (Current.Bytes - Previous.Bytes);
+      D : constant Net.Uint64 := Current.Bytes - Previous.Bytes;
    begin
       if D /= 0 then
-         Current.Bandwidth := (8_000 * D) / Net.Uint32 (Dt);
+         Current.Bandwidth := Net.Uint32 ((8_000 * D) / Net.Uint64 (Dt));
       else
          Current.Bandwidth := 0;
       end if;
