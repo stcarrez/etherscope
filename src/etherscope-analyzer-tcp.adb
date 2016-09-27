@@ -19,6 +19,7 @@ with Net.Headers;
 
 package body EtherScope.Analyzer.TCP is
 
+   use type Net.Uint16;
    use type Net.Ip_Addr;
    use type EtherScope.Stats.Group_Count;
 
