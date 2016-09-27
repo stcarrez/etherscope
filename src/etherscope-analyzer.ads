@@ -18,12 +18,15 @@
 
 --  == EtherScope Analyzer ==
 --  The packet analysis is split in different parts depending on the protocol
---  identified on the packet.
+--  identified on the packet.  Each protocol analyzer collects its own information
+--  in some <tt>Analysis</tt> record.  Some protocol analyzer also rely on the
+--  analysis of another protocol.
 --
 --  @include etherscope-analyzer-base.ads
 --  @include etherscope-analyzer-ethernet.ads
 --  @include etherscope-analyzer-ipv4.ads
 --  @include etherscope-analyzer-igmp.ads
+--  @include etherscope-analyzer-tcp.ads
 package EtherScope.Analyzer is
 
 end EtherScope.Analyzer;
