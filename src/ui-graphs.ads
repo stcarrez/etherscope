@@ -37,8 +37,10 @@ package UI.Graphs is
       Last_Pos         : Positive := 1;
       Display_Pos      : Positive := 1;
       Sample_Count     : Natural := 0;
+      Auto_Scale       : Boolean := True;
       Foreground       : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Green;
       Background       : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
+      Fill             : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Dark_Green;
    end record;
 
    --  Initialize the graph.
