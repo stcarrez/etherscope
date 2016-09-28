@@ -21,12 +21,12 @@ with Bitmapped_Drawing;
 package UI.Buttons is
 
    --  Button colors (inactive).
-   Foreground        : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
-   Background        : HAL.Bitmap.Bitmap_Color := (255, 227, 227, 227);
+   Foreground        : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
+   Background        : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
 
    --  Button colors (active).
    Active_Foreground : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
-   Active_Background : HAL.Bitmap.Bitmap_Color := (255, 201, 195, 190);
+   Active_Background : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Dark_Grey;
 
    type Button_State is (B_PRESSED, B_RELEASED, B_DISABLED);
 
