@@ -96,7 +96,8 @@ package body UI.Graphs is
       V   : Value_Type;
       Last_X : Natural := Graph.Pos.X + Graph.Width;
    begin
-      if Graph.Max_Value = 0 then
+      --  Recompute the max-value for auto-scaling.
+      if Graph.Max_Value = 0 or Graph.Auto_Scale then
          Graph.Max_Value := Compute_Max_Value (Graph);
       end if;
       Buffer.Fill_Rect (Color  => Graph.Background,
@@ -118,10 +119,13 @@ package body UI.Graphs is
                H := Graph.Height;
             end if;
 
---              Buffer.Draw_Vertical_Line (Color  => Graph.Foreground,
---                                         X      => X,
---                                         Y      => Graph.Pos.Y + Graph.Height - H,
---                                         Height => H);
+            --  If the sample is somehow heavy, fill it with the color.
+            if H > 5 then
+               Buffer.Draw_Vertical_Line (Color  => Graph.Fill,
+                                          X      => X,
+                                          Y      => 1 + Graph.Pos.Y + Graph.Height - H,
+                                          Height => H - 1);
+            end if;
          else
             H := 1;
          end if;
