@@ -36,7 +36,7 @@ package EtherScope.Display is
 
    Buttons : UI.Buttons.Button_Array (B_ETHER .. B_TCP) :=
      (B_ETHER => (Name => "Ether", State => UI.Buttons.B_PRESSED, others => <>),
-      B_IPv4  => (Name => "IPv4 ", others => <>),
+      B_IPv4  => (Name => "Proto", others => <>),
       --  B_ICMP  => (Name => "ICMP ", others => <>),
       B_IGMP  => (Name => "IGMP ", others => <>),
       --  B_UDP   => (Name => "UDP  ", others => <>),
