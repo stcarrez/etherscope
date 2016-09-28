@@ -48,12 +48,13 @@ package body UI.Buttons is
                                     Y      => Button.Pos.Y + 2,
                                     Height => Button.Height - 4);
       end if;
-      Bitmapped_Drawing.Draw_String (Buffer,
-                                     Start      => (Button.Pos.X + 4, Button.Pos.Y + 4),
-                                     Msg        => Button.Name,
-                                     Font       => Bmp_Fonts.Font16x24,
-                                     Foreground => Foreground,
-                                     Background => Color);
+      Bitmapped_Drawing.Draw_String
+        (Buffer,
+         Start      => (Button.Pos.X + 4, Button.Pos.Y + 6),
+         Msg        => Button.Name,
+         Font       => Bmp_Fonts.Font16x24,
+         Foreground => (if Button.State = B_RELEASED then Foreground else Active_Foreground),
+         Background => Color);
    end Draw_Button;
 
    --  ------------------------------
