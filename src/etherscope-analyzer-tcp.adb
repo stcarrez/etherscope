@@ -28,8 +28,10 @@ package body EtherScope.Analyzer.TCP is
    --  ------------------------------
    procedure Analyze (Packet   : in Net.Buffers.Buffer_Type;
                       Result   : in out Analysis) is
-      TCP  : constant Net.Headers.TCP_Header_Access := Packet.TCP;
-      Port : constant Net.Uint16 := (if TCP.Th_Sport < TCP.Th_Dport then TCP.Th_Sport else TCP.Th_Dport);
+      TCP   : constant Net.Headers.TCP_Header_Access := Packet.TCP;
+      Sport : constant Net.Uint16 := Net.Headers.To_Host (TCP.Th_Sport);
+      Dport : constant Net.Uint16 := Net.Headers.To_Host (TCP.Th_Dport);
+      Port  : constant Net.Uint16 := (if Sport < Dport then Sport else Dport);
    begin
       for I in 1 .. Result.Count loop
          if Result.Ports (I).Port = Port then
