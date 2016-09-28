@@ -112,9 +112,9 @@ package body EtherScope.Display is
 
       for I in Graphs'Range loop
          EtherScope.Display.Use_Graph.Initialize (Graphs (I),
-                                                  X      => 0,
+                                                  X      => 100,
                                                   Y      => 200,
-                                                  Width  => 480,
+                                                  Width  => 380,
                                                   Height => 72,
                                                   Rate   => Ada.Real_Time.Milliseconds (250));
       end loop;
@@ -316,14 +316,14 @@ package body EtherScope.Display is
          else
             UI.Texts.Draw_String (Buffer, (105, Y), 175, Image (Net.Uint32 (Port.Port)));
          end if;
-         UI.Texts.Draw_String (Buffer, (180, Y + 30), 100, Format_Packets (Port.TCP.Packets), RIGHT);
-         UI.Texts.Draw_String (Buffer, (280, Y + 30), 100, Format_Bytes (Port.TCP.Bytes), RIGHT);
+         UI.Texts.Draw_String (Buffer, (180, Y), 100, Format_Packets (Port.TCP.Packets), RIGHT);
+         UI.Texts.Draw_String (Buffer, (280, Y), 100, Format_Bytes (Port.TCP.Bytes), RIGHT);
          UI.Texts.Draw_String (Buffer, (380, Y), 100, Format_Bandwidth (Port.TCP.Bandwidth), RIGHT);
          Buffer.Draw_Horizontal_Line (Color => Line_Color,
                                       X     => 100,
-                                      Y     => Y + 55,
+                                      Y     => Y + 25,
                                       Width => Buffer.Width - 100);
-         Y := Y + 60;
+         Y := Y + 30;
       end Display_Port;
 
    begin
@@ -346,9 +346,19 @@ package body EtherScope.Display is
       Y := Y + 18;
 
       UI.Texts.Foreground := HAL.Bitmap.Green;
+      UI.Texts.Draw_String (Buffer, (105, Y), 175, "All");
+      UI.Texts.Draw_String (Buffer, (180, Y), 100, Format_Packets (TCP_Ports.TCP.Packets), RIGHT);
+      UI.Texts.Draw_String (Buffer, (280, Y), 100, Format_Bytes (TCP_Ports.TCP.Bytes), RIGHT);
+      UI.Texts.Draw_String (Buffer, (380, Y), 100, Format_Bandwidth (TCP_Ports.TCP.Bandwidth), RIGHT);
+      Buffer.Draw_Horizontal_Line (Color => Line_Color,
+                                   X     => 100,
+                                   Y     => Y + 25,
+                                   Width => Buffer.Width - 100);
+      Y := Y + 30;
+
       for I in 1 .. TCP_Ports.Count loop
          Display_Port (TCP_Ports.Ports (I));
-         exit when Y + 60 >= Buffer.Height;
+         exit when Y + 30 >= Buffer.Height;
       end loop;
       UI.Texts.Foreground := HAL.Bitmap.White;
    end Display_TCP;
@@ -387,15 +397,31 @@ package body EtherScope.Display is
 
       Bitmapped_Drawing.Draw_String
            (Buffer,
-            Start      => (30, 240),
-            Msg        => Integer'Image (Speed) & " pkts/s",
+            Start      => (3, 220),
+            Msg        => "pkts/s",
+            Font       => BMP_Fonts.Font12x12,
+            Foreground => UI.Texts.Foreground,
+            Background => UI.Texts.Background);
+
+      Bitmapped_Drawing.Draw_String
+           (Buffer,
+            Start      => (3, 160),
+            Msg        => "bps",
+            Font       => BMP_Fonts.Font12x12,
+            Foreground => UI.Texts.Foreground,
+            Background => UI.Texts.Background);
+
+      Bitmapped_Drawing.Draw_String
+           (Buffer,
+            Start      => (3, 250),
+            Msg        => Integer'Image (Speed),
             Font       => BMP_Fonts.Font16x24,
             Foreground => UI.Texts.Foreground,
             Background => UI.Texts.Background);
 
       Bitmapped_Drawing.Draw_String
            (Buffer,
-            Start      => (250, 240),
+            Start      => (0, 180),
             Msg        => Format_Bandwidth (Interfaces.Unsigned_32 (Bandwidth)),
             Font       => BMP_Fonts.Font16x24,
             Foreground => UI.Texts.Foreground,
