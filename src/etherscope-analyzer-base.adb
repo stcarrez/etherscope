@@ -119,6 +119,8 @@ package body EtherScope.Analyzer.Base is
       begin
          Update_Rates;
          Ports.Ports := TCP_Ports.Ports;
+         Ports.Count := TCP_Ports.Count;
+         Ports.TCP   := IPv4.TCP;
       end Get_TCP;
 
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
@@ -142,7 +144,7 @@ package body EtherScope.Analyzer.Base is
       procedure Analyze_IPv4 (Packet : in out Net.Buffers.Buffer_Type;
                               Device : in EtherScope.Stats.Device_Index) is
       begin
-         EtherScope.Analyzer.IPv4.Analyze (Packet, Device, IPv4, IGMP_Groups, Samples);
+         EtherScope.Analyzer.IPv4.Analyze (Packet, Device, IPv4, IGMP_Groups, TCP_Ports, Samples);
       end Analyze_IPv4;
 
    end DB;
