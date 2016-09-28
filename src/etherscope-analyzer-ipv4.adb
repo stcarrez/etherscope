@@ -29,6 +29,7 @@ package body EtherScope.Analyzer.IPv4 is
                       Device   : in Device_Index;
                       Result   : in out Analysis;
                       Groups   : in out EtherScope.Analyzer.IGMP.Analysis;
+                      Ports    : in out EtherScope.Analyzer.TCP.Analysis;
                       Samples  : in out EtherScope.Stats.Graph_Samples) is
       use type Net.Ip_Addr;
 
@@ -57,6 +58,7 @@ package body EtherScope.Analyzer.IPv4 is
          when Net.Protos.IPv4.P_TCP =>
             EtherScope.Stats.Add (Samples, EtherScope.Stats.G_TCP, Result.TCP, Length);
             EtherScope.Stats.Add (Result.Devices (Device).TCP, Length);
+            EtherScope.Analyzer.TCP.Analyze (Packet, Ports);
 
          when Net.Protos.IPv4.P_ICMP =>
             EtherScope.Stats.Add (Samples, EtherScope.Stats.G_ICMP, Result.ICMP, Length);
