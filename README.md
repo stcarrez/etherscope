@@ -61,5 +61,5 @@ switch to different display modes:
 
 The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
 
-![](images/etherscope-igmp.png)
+![](wiki/images/etherscope-igmp.png)
 
