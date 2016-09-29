@@ -59,7 +59,9 @@ package EtherScope.Display is
    --  Draw the display buttons.
    procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
 
-   procedure Refresh_Graphs (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   --  Refresh the graph and draw it.
+   procedure Refresh_Graphs (Buffer     : in HAL.Bitmap.Bitmap_Buffer'Class;
+                             Graph_Mode : in EtherScope.Stats.Graph_Kind);
 
    --  Display devices found on the network.
    procedure Display_Devices (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
