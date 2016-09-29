@@ -32,6 +32,7 @@ with Net.Buffers;
 with UI.Buttons;
 with EtherScope.Display;
 with EtherScope.Receiver;
+with EtherScope.Stats;
 
 --  The main EtherScope task must run at a lower priority as it takes care
 --  of displaying results on the screen while the EtherScope receiver's task
@@ -56,6 +57,9 @@ procedure Etheroscope with Priority => System.Priority'First is
    --  Current display mode.
    Mode             : UI.Buttons.Button_Event := EtherScope.Display.B_ETHER;
    Button_Changed   : Boolean := False;
+
+   --  Display the Ethernet graph (all traffic).
+   Graph_Mode       : EtherScope.Stats.Graph_Kind := EtherScope.Stats.G_ETHERNET;
 begin
    STM32.RNG.Interrupts.Initialize_RNG;
    STM32.Button.Initialize;
@@ -116,21 +120,25 @@ begin
             case Mode is
                when EtherScope.Display.B_ETHER =>
                   EtherScope.Display.Display_Devices (Buffer);
+                  Graph_Mode := EtherScope.Stats.G_ETHERNET;
 
                when EtherScope.Display.B_IPv4 =>
                   EtherScope.Display.Display_Protocols (Buffer);
+                  Graph_Mode := EtherScope.Stats.G_ETHERNET;
 
                when EtherScope.Display.B_IGMP =>
                   EtherScope.Display.Display_Groups (Buffer);
+                  Graph_Mode := EtherScope.Stats.G_UDP;
 
                when EtherScope.Display.B_TCP =>
                   EtherScope.Display.Display_TCP (Buffer);
+                  Graph_Mode := EtherScope.Stats.G_TCP;
 
                when others =>
                   null;
 
             end case;
-            EtherScope.Display.Refresh_Graphs (Buffer);
+            EtherScope.Display.Refresh_Graphs (Buffer, Graph_Mode);
             EtherScope.Display.Display_Summary (Buffer);
             STM32.Board.Display.Update_Layer (1);
             Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
