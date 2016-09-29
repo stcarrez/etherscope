@@ -146,7 +146,11 @@ package body EtherScope.Display is
                                Height => 34);
    end Draw_Buttons;
 
-   procedure Refresh_Graphs (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   --  ------------------------------
+   --  Refresh the graph and draw it.
+   --  ------------------------------
+   procedure Refresh_Graphs (Buffer     : in HAL.Bitmap.Bitmap_Buffer'Class;
+                             Graph_Mode : in EtherScope.Stats.Graph_Kind) is
       Now     : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
       Samples : EtherScope.Stats.Graph_Samples;
    begin
@@ -154,7 +158,7 @@ package body EtherScope.Display is
       for I in Samples'Range loop
          Use_Graph.Add_Sample (Graphs (I), Samples (I), Now);
       end loop;
-      Use_Graph.Draw (Buffer, Graphs (EtherScope.Stats.G_ETHERNET));
+      Use_Graph.Draw (Buffer, Graphs (Graph_Mode));
    end Refresh_Graphs;
 
    --  ------------------------------
