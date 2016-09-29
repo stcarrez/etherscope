@@ -116,7 +116,7 @@ package body EtherScope.Display is
                                                   Y      => 200,
                                                   Width  => 380,
                                                   Height => 72,
-                                                  Rate   => Ada.Real_Time.Milliseconds (250));
+                                                  Rate   => Ada.Real_Time.Milliseconds (1000));
       end loop;
    end Initialize;
 
@@ -370,7 +370,7 @@ package body EtherScope.Display is
    use Ada.Real_Time;
    Prev_Time : Ada.Real_Time.Time := Ada.Real_Time.Clock;
    Deadline  : Ada.Real_Time.Time := Prev_Time + Ada.Real_Time.Seconds (1);
-   Speed      : Natural := 0;
+   Speed      : Net.Uint32 := 0;
    Bandwidth  : Natural := 0;
    Pkts       : Net.Uint32 := 0;
    Bytes      : Net.Uint64 := 0;
@@ -383,21 +383,26 @@ package body EtherScope.Display is
       Now       : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
       Cur_Pkts  : Net.Uint32;
       Cur_Bytes : Net.Uint64;
-      D         : Integer;
-      C         : Integer;
+      D         : Net.Uint32;
+      C         : Net.Uint32;
    begin
       if Deadline < Now then
          Cur_Bytes := EtherScope.Receiver.Ifnet.Rx_Stats.Bytes;
          Cur_Pkts  := EtherScope.Receiver.Ifnet.Rx_Stats.Packets;
-         C := (Now - Prev_Time) / ONE_MS;
-         D := Integer (Cur_Pkts - Pkts);
-         Speed := (D * 1000) / C;
+         C := Net.Uint32 ((Now - Prev_Time) / ONE_MS);
+         D := Net.Uint32 (Cur_Pkts - Pkts);
+         Speed := Net.Uint32 (D * 1000) / C;
          Bandwidth := Natural (((Cur_Bytes - Bytes) * 8000) / Net.Uint64 (C));
          Prev_Time := Now;
          Deadline := Deadline + Ada.Real_Time.Seconds (1);
          Pkts := Cur_Pkts;
          Bytes := Cur_Bytes;
       end if;
+      Buffer.Fill_Rect (Color  => UI.Texts.Background,
+                        X      => 0,
+                        Y      => 160,
+                        Width  => 99,
+                        Height => Buffer.Height - 160);
 
       Bitmapped_Drawing.Draw_String
            (Buffer,
@@ -417,8 +422,8 @@ package body EtherScope.Display is
 
       Bitmapped_Drawing.Draw_String
            (Buffer,
-            Start      => (3, 250),
-            Msg        => Integer'Image (Speed),
+            Start      => (0, 250),
+            Msg        => Image (Speed),
             Font       => BMP_Fonts.Font16x24,
             Foreground => UI.Texts.Foreground,
             Background => UI.Texts.Background);
