@@ -66,14 +66,14 @@ switch to different display modes:
 
 The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
 
-![](https://github.com/stcarrez/etherscope/wiki/images/etherscope-igmp.png)
+![](https://github.com/stcarrez/etherscope/wiki/images/etherscope-v1.png)
 
 # Publication
 
 * The EtherScope project was submitted to the [Make with Ada](http://www.makewithada.org/) competition.
 
-* [Ethernet Traffic Monitor on a STM32F746](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/30/Ethernet-Traffic-Monitor-on-a-STM32F746)
+* Article: [Ethernet Traffic Monitor on a STM32F746](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/30/Ethernet-Traffic-Monitor-on-a-STM32F746)
 
-* [Using the Ada Embedded Network STM32 Ethernet Driver](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/29/Using-the-Ada-Embedded-Network-STM32-Ethernet-Driver)
+* Article: [Using the Ada Embedded Network STM32 Ethernet Driver](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/29/Using-the-Ada-Embedded-Network-STM32-Ethernet-Driver)
 
 * Video: [EtherScope an Ethernet Traffic Monitor](https://youtu.be/zEtA-S5jvfY)
