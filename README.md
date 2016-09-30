@@ -38,6 +38,10 @@ Then, flash the image with:
 
   st-flash write etherscope.bin 0x8000000
 
+or just
+
+  make flash
+
 # Using EtherScope
 
 To look at the network traffic, it is recommended to have a switch that supports
@@ -61,5 +65,11 @@ switch to different display modes:
 
 The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
 
-![](https://github.com/stcarrez/etherscope/wiki/images/etherscope-igmp.png)
+![](https://github.com/stcarrez/etherscope/ls -l wiki/images/etherscope-igmp.png)
+
+# Publication
+
+* The EtherScope project was submitted to the [Make with Ada](http://www.makewithada.org/) competition.
+
+* [Ethernet Traffic Monitor on a STM32F746](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/30/Ethernet-Traffic-Monitor-on-a-STM32F746)
 
