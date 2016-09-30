@@ -2,6 +2,7 @@
 
 [![Build Status](https://img.shields.io/jenkins/s/http/jenkins.vacs.fr/etherscope.svg)](http://jenkins.vacs.fr/job/etherscope/)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
+![Commits](https://img.shields.io/github/commits-since/stcarrez/etherscope/1.0.0.svg)
 
 EtherScope is a monitoring tool that analyzes the Ethernet traffic.
 It runs on a STM32F746 board, reads the Ethernet packets, do some
@@ -65,7 +66,7 @@ switch to different display modes:
 
 The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
 
-![](https://github.com/stcarrez/etherscope/ls -l wiki/images/etherscope-igmp.png)
+![](https://github.com/stcarrez/etherscope/wiki/images/etherscope-igmp.png)
 
 # Publication
 
@@ -73,3 +74,6 @@ The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
 
 * [Ethernet Traffic Monitor on a STM32F746](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/30/Ethernet-Traffic-Monitor-on-a-STM32F746)
 
+* [Using the Ada Embedded Network STM32 Ethernet Driver](http://blog.vacs.fr/vacs/blogs/post.html?post=2016/09/29/Using-the-Ada-Embedded-Network-STM32-Ethernet-Driver)
+
+* Video: [EtherScope an Ethernet Traffic Monitor](https://youtu.be/zEtA-S5jvfY)
