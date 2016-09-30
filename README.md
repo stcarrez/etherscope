@@ -59,12 +59,13 @@ Once powered up, the EtherScope starts the analysis and offers 4 buttons to
 switch to different display modes:
 
 * <b>Ether</b> displays the list of devices found on the network.
-* <b>IPv4</b> displays the different IPv4 protocols found on the network.
+* <b>Proto</b> displays the different IPv4 protocols found on the network.
 * <b>IGMP</b> displays the UDP multicast groups which are subscribed on the network.
 * <b>TCP</b> displays the list of high level application protocols (http, https, ssh, ...).
 
 
-The following screenshot show the IGMP panel with 3 multicast groups (IP TV HD).
+The following screenshot shows the TCP panel with 3 recognized TCP protocols and a running
+SCP that uses almost all the bandwidth.
 
 ![](https://github.com/stcarrez/etherscope/wiki/images/etherscope-v1.png)
 
