@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  ui -- User Interface Framework
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,43 +16,37 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Bitmapped_Drawing;
-with Bmp_Fonts;
+with BMP_Fonts;
 package body UI.Buttons is
 
 
    --  ------------------------------
    --  Draw the button in its current state on the bitmap.
    --  ------------------------------
-   procedure Draw_Button (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Draw_Button (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class;
                           Button : in Button_Type) is
       Color : constant HAL.Bitmap.Bitmap_Color
         := (if Button.State = B_RELEASED then Background else Active_Background);
    begin
-      Buffer.Fill_Rect (Color  => Color,
-                        X      => Button.Pos.X + 1,
-                        Y      => Button.Pos.Y + 1,
-                        Width  => Button.Width - 2,
-                        Height => Button.Height - 2);
+      Buffer.Set_Source (Color);
+      Buffer.Fill_Rect (Area => (Position => (Button.Pos.X + 1, Button.Pos.Y + 1),
+                                 Width  => Button.Width - 2,
+                                 Height => Button.Height - 2));
       if Button.State = B_PRESSED then
-         Buffer.Draw_Rect (Color  => HAL.Bitmap.Grey,
-                           X      => Button.Pos.X + 3,
-                           Y      => Button.Pos.Y + 3,
-                           Width  => Button.Width - 5,
-                           Height => Button.Height - 6);
-         Buffer.Draw_Horizontal_Line (Color => HAL.Bitmap.Light_Grey,
-                                      X     => Button.Pos.X + 2,
-                                      Y     => Button.Pos.Y + 2,
+         Buffer.Set_Source (HAL.Bitmap.Grey);
+         Buffer.Draw_Rect (Area => (Position => (Button.Pos.X + 3, Button.Pos.Y + 3),
+                                    Width  => Button.Width - 5,
+                                    Height => Button.Height - 6));
+         Buffer.Draw_Horizontal_Line (Pt => (Button.Pos.X + 2, Button.Pos.Y + 2),
                                       Width => Button.Width - 4);
-         Buffer.Draw_Vertical_Line (Color  => HAL.Bitmap.Light_Grey,
-                                    X      => Button.Pos.X + 2,
-                                    Y      => Button.Pos.Y + 2,
+         Buffer.Draw_Vertical_Line (Pt => (Button.Pos.X + 2, Button.Pos.Y + 2),
                                     Height => Button.Height - 4);
       end if;
       Bitmapped_Drawing.Draw_String
         (Buffer,
          Start      => (Button.Pos.X + 4, Button.Pos.Y + 6),
          Msg        => Button.Name,
-         Font       => Bmp_Fonts.Font16x24,
+         Font       => BMP_Fonts.Font16x24,
          Foreground => (if Button.State = B_RELEASED then Foreground else Active_Foreground),
          Background => Color);
    end Draw_Button;
@@ -61,7 +55,7 @@ package body UI.Buttons is
    --  Layout and draw a list of buttons starting at the given top position.
    --  Each button is assigned the given width and height.
    --  ------------------------------
-   procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class;
                            List   : in out Button_Array;
                            X      : in Natural;
                            Y      : in Natural;
@@ -106,6 +100,7 @@ package body UI.Buttons is
                         Touch  : in out HAL.Touch_Panel.Touch_Panel_Device'Class;
                         List   : in Button_Array;
                         Event  : out Button_Event) is
+      pragma Unreferenced (Buffer);
       State : constant HAL.Touch_Panel.TP_State := Touch.Get_All_Touch_Points;
       X     : Natural;
       Y     : Natural;
