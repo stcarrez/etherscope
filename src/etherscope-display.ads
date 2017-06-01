@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  etherscope-display -- Display manager
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,28 +54,28 @@ package EtherScope.Display is
    procedure Initialize;
 
    --  Draw the layout presentation frame.
-   procedure Draw_Frame (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Draw_Frame (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Draw the display buttons.
-   procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Refresh the graph and draw it.
-   procedure Refresh_Graphs (Buffer     : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Refresh_Graphs (Buffer     : in out HAL.Bitmap.Bitmap_Buffer'Class;
                              Graph_Mode : in EtherScope.Stats.Graph_Kind);
 
    --  Display devices found on the network.
-   procedure Display_Devices (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Display_Devices (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display devices found on the network.
-   procedure Display_Protocols (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Display_Protocols (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display TCP/IP information found on the network.
-   procedure Display_TCP (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Display_TCP (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display IGMP groups found on the network.
-   procedure Display_Groups (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Display_Groups (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display a performance summary indicator.
-   procedure Display_Summary (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class);
+   procedure Display_Summary (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
 end EtherScope.Display;
