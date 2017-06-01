@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  etherscope-display -- Display manager
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -123,20 +123,20 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Draw the layout presentation frame.
    --  ------------------------------
-   procedure Draw_Frame (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Draw_Frame (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
    begin
-      Buffer.Fill (UI.Texts.Background);
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill;
       Draw_Buttons (Buffer);
-      Buffer.Draw_Vertical_Line (Color  => Line_Color,
-                                 X      => 98,
-                                 Y      => 0,
+      Buffer.Set_Source (Line_Color);
+      Buffer.Draw_Vertical_Line (Pt     => (98, 0),
                                  Height => Buffer.Height);
    end Draw_Frame;
 
    --  ------------------------------
    --  Draw the display buttons.
    --  ------------------------------
-   procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
    begin
       UI.Buttons.Draw_Buttons (Buffer => Buffer,
                                List   => Buttons,
@@ -149,7 +149,7 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Refresh the graph and draw it.
    --  ------------------------------
-   procedure Refresh_Graphs (Buffer     : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Refresh_Graphs (Buffer     : in out HAL.Bitmap.Bitmap_Buffer'Class;
                              Graph_Mode : in EtherScope.Stats.Graph_Kind) is
       Now     : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
       Samples : EtherScope.Stats.Graph_Samples;
@@ -164,17 +164,16 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Display devices found on the network.
    --  ------------------------------
-   procedure Display_Devices (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Display_Devices (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
 
       Y      : Natural := 15;
    begin
       EtherScope.Analyzer.Base.Get_Devices (Devices);
-      Buffer.Fill_Rect (Color  => UI.Texts.Background,
-                        X      => 100,
-                        Y      => 0,
-                        Width  => Buffer.Width - 100,
-                        Height => Buffer.Height);
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill_Rect (Area => (Position => (100, 0),
+                                 Width  => Buffer.Width - 100,
+                                 Height => Buffer.Height));
       for I in 1 .. Devices.Count loop
          declare
             Ethernet : EtherScope.Analyzer.Ethernet.Device_Stats renames Devices.Ethernet (I);
@@ -186,9 +185,8 @@ package body EtherScope.Display is
             UI.Texts.Draw_String (Buffer, (200, Y + 20), 200, Format_Bytes (Ethernet.Stats.Bytes), RIGHT);
             UI.Texts.Draw_String (Buffer, (400, Y + 20), 80, Format_Bandwidth (Ethernet.Stats.Bandwidth));
          end;
-         Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                      X     => 100,
-                                      Y     => Y + 45,
+         Buffer.Set_Source (Line_Color);
+         Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 45),
                                       Width => Buffer.Width - 100);
          Y := Y + 50;
          exit when Y + 60 >= Buffer.Height;
@@ -198,7 +196,7 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Display devices found on the network.
    --  ------------------------------
-   procedure Display_Protocols (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Display_Protocols (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
       procedure Display_Protocol (Name : in String;
                                   Stat : in EtherScope.Stats.Statistics);
@@ -212,29 +210,26 @@ package body EtherScope.Display is
          UI.Texts.Draw_String (Buffer, (150, Y), 100, Format_Packets (Stat.Packets), RIGHT);
          UI.Texts.Draw_String (Buffer, (250, Y), 100, Format_Bytes (Stat.Bytes), RIGHT);
          UI.Texts.Draw_String (Buffer, (350, Y), 100, Format_Bandwidth (Stat.Bandwidth), RIGHT);
-         Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                      X     => 100,
-                                      Y     => Y + 23,
+         Buffer.Set_Source (Line_Color);
+         Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 23),
                                       Width => Buffer.Width - 100);
          Y := Y + 30;
       end Display_Protocol;
 
    begin
       EtherScope.Analyzer.Base.Get_Protocols (Protocols);
-      Buffer.Fill_Rect (Color  => UI.Texts.Background,
-                        X      => 100,
-                        Y      => 0,
-                        Width  => Buffer.Width - 100,
-                        Height => Buffer.Height);
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill_Rect (Area => (Position => (100, 0),
+                                 Width  => Buffer.Width - 100,
+                                 Height => Buffer.Height));
 
       --  Draw some column header.
       UI.Texts.Draw_String (Buffer, (100, Y), 150, "Protocol");
       UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
       UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
       UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
-      Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                   X     => 100,
-                                   Y     => Y + 14,
+      Buffer.Set_Source (Line_Color);
+      Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
                                    Width => Buffer.Width - 100);
       Y := Y + 18;
 
@@ -251,7 +246,7 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Display IGMP groups found on the network.
    --  ------------------------------
-   procedure Display_Groups (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Display_Groups (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
       procedure Display_Group (Group : in EtherScope.Analyzer.IGMP.Group_Stats);
 
@@ -263,29 +258,26 @@ package body EtherScope.Display is
          UI.Texts.Draw_String (Buffer, (180, Y + 30), 100, Format_Packets (Group.UDP.Packets), RIGHT);
          UI.Texts.Draw_String (Buffer, (280, Y + 30), 100, Format_Bytes (Group.UDP.Bytes), RIGHT);
          UI.Texts.Draw_String (Buffer, (380, Y), 100, Format_Bandwidth (Group.UDP.Bandwidth), RIGHT);
-         Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                      X     => 100,
-                                      Y     => Y + 55,
+         Buffer.Set_Source (Line_Color);
+         Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 55),
                                       Width => Buffer.Width - 100);
          Y := Y + 60;
       end Display_Group;
 
    begin
       EtherScope.Analyzer.Base.Get_Groups (Groups);
-      Buffer.Fill_Rect (Color  => UI.Texts.Background,
-                        X      => 100,
-                        Y      => 0,
-                        Width  => Buffer.Width - 100,
-                        Height => Buffer.Height);
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill_Rect (Area => (Position => (100, 0),
+                                 Width  => Buffer.Width - 100,
+                                 Height => Buffer.Height));
 
       --  Draw some column header.
       UI.Texts.Draw_String (Buffer, (105, Y), 175, "IP");
       UI.Texts.Draw_String (Buffer, (180, Y), 100, "Packets", RIGHT);
       UI.Texts.Draw_String (Buffer, (280, Y), 100, "Bytes", RIGHT);
       UI.Texts.Draw_String (Buffer, (380, Y), 100, "Bandwidth", RIGHT);
-      Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                   X     => 100,
-                                   Y     => Y + 14,
+      Buffer.Set_Source (Line_Color);
+      Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
                                    Width => Buffer.Width - 100);
       Y := Y + 18;
 
@@ -300,7 +292,7 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Display TCP/IP information found on the network.
    --  ------------------------------
-   procedure Display_TCP (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Display_TCP (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
       use EtherScope.Analyzer.Base;
       procedure Display_Port (Port : in EtherScope.Analyzer.TCP.TCP_Stats);
 
@@ -323,29 +315,26 @@ package body EtherScope.Display is
          UI.Texts.Draw_String (Buffer, (180, Y), 100, Format_Packets (Port.TCP.Packets), RIGHT);
          UI.Texts.Draw_String (Buffer, (280, Y), 100, Format_Bytes (Port.TCP.Bytes), RIGHT);
          UI.Texts.Draw_String (Buffer, (380, Y), 100, Format_Bandwidth (Port.TCP.Bandwidth), RIGHT);
-         Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                      X     => 100,
-                                      Y     => Y + 25,
+         Buffer.Set_Source (Line_Color);
+         Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 25),
                                       Width => Buffer.Width - 100);
          Y := Y + 30;
       end Display_Port;
 
    begin
       EtherScope.Analyzer.Base.Get_TCP (TCP_Ports);
-      Buffer.Fill_Rect (Color  => UI.Texts.Background,
-                        X      => 100,
-                        Y      => 0,
-                        Width  => Buffer.Width - 100,
-                        Height => Buffer.Height);
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill_Rect (Area  => (Position => (100, 0),
+                                  Width  => Buffer.Width - 100,
+                                  Height => Buffer.Height));
 
       --  Draw some column header.
       UI.Texts.Draw_String (Buffer, (105, Y), 175, "TCP Port");
       UI.Texts.Draw_String (Buffer, (180, Y), 100, "Packets", RIGHT);
       UI.Texts.Draw_String (Buffer, (280, Y), 100, "Bytes", RIGHT);
       UI.Texts.Draw_String (Buffer, (380, Y), 100, "Bandwidth", RIGHT);
-      Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                   X     => 100,
-                                   Y     => Y + 14,
+      Buffer.Set_Source (Line_Color);
+      Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
                                    Width => Buffer.Width - 100);
       Y := Y + 18;
 
@@ -354,9 +343,9 @@ package body EtherScope.Display is
       UI.Texts.Draw_String (Buffer, (180, Y), 100, Format_Packets (TCP_Ports.TCP.Packets), RIGHT);
       UI.Texts.Draw_String (Buffer, (280, Y), 100, Format_Bytes (TCP_Ports.TCP.Bytes), RIGHT);
       UI.Texts.Draw_String (Buffer, (380, Y), 100, Format_Bandwidth (TCP_Ports.TCP.Bandwidth), RIGHT);
-      Buffer.Draw_Horizontal_Line (Color => Line_Color,
-                                   X     => 100,
-                                   Y     => Y + 25,
+
+      Buffer.Set_Source (Line_Color);
+      Buffer.Draw_Horizontal_Line (Pt    => (100, 25),
                                    Width => Buffer.Width - 100);
       Y := Y + 30;
 
@@ -379,7 +368,7 @@ package body EtherScope.Display is
    --  ------------------------------
    --  Display a performance summary indicator.
    --  ------------------------------
-   procedure Display_Summary (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Display_Summary (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
       Now       : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
       Cur_Pkts  : Net.Uint32;
       Cur_Bytes : Net.Uint64;
@@ -398,11 +387,10 @@ package body EtherScope.Display is
          Pkts := Cur_Pkts;
          Bytes := Cur_Bytes;
       end if;
-      Buffer.Fill_Rect (Color  => UI.Texts.Background,
-                        X      => 0,
-                        Y      => 160,
-                        Width  => 99,
-                        Height => Buffer.Height - 160);
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill_Rect (Area  => (Position => (0, 160),
+                                  Width  => 99,
+                                  Height => Buffer.Height - 160));
 
       Bitmapped_Drawing.Draw_String
            (Buffer,
