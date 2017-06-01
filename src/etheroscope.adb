@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  etheroscope -- Ether Oscope main program
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ with Interfaces;
 
 with Ada.Real_Time;
 
-with STM32.Button;
+--  with STM32.Button;
 with STM32.Board;
 with STM32.RNG.Interrupts;
 with STM32.Eth;
@@ -62,13 +62,13 @@ procedure Etheroscope with Priority => System.Priority'First is
    Graph_Mode       : EtherScope.Stats.Graph_Kind := EtherScope.Stats.G_ETHERNET;
 begin
    STM32.RNG.Interrupts.Initialize_RNG;
-   STM32.Button.Initialize;
+   --  STM32.Button.Initialize;
 
    --  Initialize the display and draw the main/fixed frames in both buffers.
    EtherScope.Display.Initialize;
-   EtherScope.Display.Draw_Frame (STM32.Board.Display.Get_Hidden_Buffer (1));
+   EtherScope.Display.Draw_Frame (STM32.Board.Display.Hidden_Buffer (1).all);
    STM32.Board.Display.Update_Layer (1);
-   EtherScope.Display.Draw_Frame (STM32.Board.Display.Get_Hidden_Buffer (1));
+   EtherScope.Display.Draw_Frame (STM32.Board.Display.Hidden_Buffer (1).all);
 
    --  Initialize the Ethernet driver.
    STM32.Eth.Initialize_RMII;
@@ -81,7 +81,7 @@ begin
    EtherScope.Receiver.Ifnet.Mac := (0, 16#81#, 16#E1#, 5, 5, 1);
 
    --  Setup some receive buffers and initialize the Ethernet driver.
-   Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => NET_BUFFER_SIZE), NET_BUFFER_SIZE);
+   Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => HAL.UInt32 (NET_BUFFER_SIZE)), NET_BUFFER_SIZE);
    EtherScope.Receiver.Ifnet.Initialize;
 
    Refresh_Deadline := Ada.Real_Time.Clock + REFRESH_PERIOD;
@@ -91,17 +91,17 @@ begin
       declare
          Action  : UI.Buttons.Button_Event;
          Now     : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
-         Buffer  : constant HAL.Bitmap.Bitmap_Buffer'Class := STM32.Board.Display.Get_Hidden_Buffer (1);
+         Buffer  : constant HAL.Bitmap.Any_Bitmap_Buffer := STM32.Board.Display.Hidden_Buffer (1);
       begin
          --  We updated the buttons in the previous layer and
          --  we must update them in the second one.
          if Button_Changed then
-            EtherScope.Display.Draw_Buttons (Buffer);
+            EtherScope.Display.Draw_Buttons (Buffer.all);
             Button_Changed := False;
          end if;
 
          --  Check for a button being pressed.
-         UI.Buttons.Get_Event (Buffer => Buffer,
+         UI.Buttons.Get_Event (Buffer => Buffer.all,
                                Touch  => STM32.Board.Touch_Panel,
                                List   => EtherScope.Display.Buttons,
                                Event  => Action);
@@ -111,7 +111,7 @@ begin
 
             --  Update the buttons in the first layer.
             if Button_Changed then
-               EtherScope.Display.Draw_Buttons (Buffer);
+               EtherScope.Display.Draw_Buttons (Buffer.all);
             end if;
          end if;
 
@@ -119,27 +119,27 @@ begin
          if Refresh_Deadline <= Now or Button_Changed then
             case Mode is
                when EtherScope.Display.B_ETHER =>
-                  EtherScope.Display.Display_Devices (Buffer);
+                  EtherScope.Display.Display_Devices (Buffer.all);
                   Graph_Mode := EtherScope.Stats.G_ETHERNET;
 
                when EtherScope.Display.B_IPv4 =>
-                  EtherScope.Display.Display_Protocols (Buffer);
+                  EtherScope.Display.Display_Protocols (Buffer.all);
                   Graph_Mode := EtherScope.Stats.G_ETHERNET;
 
                when EtherScope.Display.B_IGMP =>
-                  EtherScope.Display.Display_Groups (Buffer);
+                  EtherScope.Display.Display_Groups (Buffer.all);
                   Graph_Mode := EtherScope.Stats.G_UDP;
 
                when EtherScope.Display.B_TCP =>
-                  EtherScope.Display.Display_TCP (Buffer);
+                  EtherScope.Display.Display_TCP (Buffer.all);
                   Graph_Mode := EtherScope.Stats.G_TCP;
 
                when others =>
                   null;
 
             end case;
-            EtherScope.Display.Refresh_Graphs (Buffer, Graph_Mode);
-            EtherScope.Display.Display_Summary (Buffer);
+            EtherScope.Display.Refresh_Graphs (Buffer.all, Graph_Mode);
+            EtherScope.Display.Display_Summary (Buffer.all);
             STM32.Board.Display.Update_Layer (1);
             Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
          end if;
