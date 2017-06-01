@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  ui-graphs -- Generic package to draw graphs
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,23 +88,22 @@ package body UI.Graphs is
    --  ------------------------------
    --  Draw the graph.
    --  ------------------------------
-   procedure Draw (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Draw (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class;
                    Graph  : in out Graph_Type) is
       Pos : Positive := 1;
       X   : Natural := Graph.Pos.X;
       H   : Natural;
       V   : Value_Type;
-      Last_X : Natural := Graph.Pos.X + Graph.Width;
+      Last_X : constant Natural := Graph.Pos.X + Graph.Width;
    begin
       --  Recompute the max-value for auto-scaling.
       if Graph.Max_Value = 0 or Graph.Auto_Scale then
          Graph.Max_Value := Compute_Max_Value (Graph);
       end if;
-      Buffer.Fill_Rect (Color  => Graph.Background,
-                        X      => Graph.Pos.X,
-                        Y      => Graph.Pos.Y,
-                        Width  => Graph.Width,
-                        Height => Graph.Height);
+      Buffer.Set_Source (Graph.Background);
+      Buffer.Fill_Rect (Area => (Position => (Graph.Pos.X, Graph.Pos.Y),
+                                 Width  => Graph.Width,
+                                 Height => Graph.Height));
       if Graph.Max_Value = Value_Type'First then
          return;
       end if;
@@ -130,17 +129,15 @@ package body UI.Graphs is
 
             --  If the sample is somehow heavy, fill it with the color.
             if H > 5 then
-               Buffer.Draw_Vertical_Line (Color  => Graph.Fill,
-                                          X      => X,
-                                          Y      => 1 + Graph.Pos.Y + Graph.Height - H,
+               Buffer.Set_Source (Graph.Fill);
+               Buffer.Draw_Vertical_Line (Pt => (X, 1 + Graph.Pos.Y + Graph.Height - H),
                                           Height => H - 1);
             end if;
          else
             H := 1;
          end if;
-         Buffer.Set_Pixel (X     => X,
-                           Y     => Graph.Pos.Y + Graph.Height - H,
-                           Value => Graph.Foreground);
+         Buffer.Set_Source (Graph.Foreground);
+         Buffer.Set_Pixel (Pt => (X, Graph.Pos.Y + Graph.Height - H));
          if Pos = Graph.Samples'Last then
             Pos := Graph.Samples'First;
          else
