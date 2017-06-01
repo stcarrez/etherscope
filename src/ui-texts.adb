@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  ui-texts -- Utilities to draw text strings
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,14 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Interfaces;
+with Bitmapped_Drawing;
+with Bitmap_Color_Conversion;
 package body UI.Texts is
 
+   function Char_Width (C : in Character) return Natural;
+
    function Char_Width (C : in Character) return Natural is
+      pragma Unreferenced (C);
       use type BMP_Fonts.BMP_Font;
    begin
       if Current_Font /= BMP_Fonts.Font12x12 then
@@ -41,18 +45,18 @@ package body UI.Texts is
    --  span more than the width.  The current font, foreground and background are used
    --  to draw the string.
    --  ------------------------------
-   procedure Draw_String (Buffer  : in HAL.Bitmap.Bitmap_Buffer'Class;
-                          Start   : in Bitmapped_Drawing.Point;
+   procedure Draw_String (Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                          Start   : in HAL.Bitmap.Point;
                           Width   : in Natural;
                           Msg     : in String;
                           Justify : in Justify_Type := LEFT) is
       X    : Natural := Start.X;
-      Y    : Natural := Start.Y;
+      Y    : constant Natural := Start.Y;
       Last : Natural := Start.X + Width;
-      FG    : constant Interfaces.Unsigned_32 := HAL.Bitmap.Bitmap_Color_To_Word (Buffer.Color_Mode,
-                                                                                  Foreground);
-      BG    : constant Interfaces.Unsigned_32 := HAL.Bitmap.Bitmap_Color_To_Word (Buffer.Color_Mode,
-                                                                                  Background);
+      FG    : constant HAL.UInt32 := Bitmap_Color_Conversion.Bitmap_Color_To_Word (Buffer.Color_Mode,
+                                                                      Foreground);
+      BG    : constant HAL.UInt32 := Bitmap_Color_Conversion.Bitmap_Color_To_Word (Buffer.Color_Mode,
+                                                                      Background);
    begin
       if Last > Buffer.Width then
          Last := Buffer.Width;
