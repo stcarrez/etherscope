@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  etherscope-analyzer-base -- Packet analyzer
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -125,6 +125,7 @@ package body EtherScope.Analyzer.Base is
 
       procedure Update_Graph_Samples (Result : out EtherScope.Stats.Graph_Samples;
                                       Clear  : in Boolean) is
+         pragma Unreferenced (Clear);
       begin
          Result := Samples;
          for I in Samples'Range loop
@@ -137,7 +138,7 @@ package body EtherScope.Analyzer.Base is
          Ether   : Net.Headers.Ether_Header_Access;
       begin
          Ether := Packet.Ethernet;
-         EtherScope.Analyzer.Ethernet.Analyze (Ether, Net.Uint16 (Packet.Get_Length),
+         EtherScope.Analyzer.Ethernet.Analyze (Ether, Packet.Get_Length,
                                                Ethernet, Samples, Device);
       end Analyze_Ethernet;
 
