@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  ui -- User Interface Framework
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with HAL.Bitmap;
 with HAL.Touch_Panel;
-with Bitmapped_Drawing;
 package UI.Buttons is
 
    --  Button colors (inactive).
@@ -32,7 +31,7 @@ package UI.Buttons is
 
    type Button_Type is record
       Name   : String (1 .. 5);
-      Pos    : Bitmapped_Drawing.Point := (0, 0);
+      Pos    : HAL.Bitmap.Point := (0, 0);
       Width  : Positive;
       Height : Positive;
       State  : Button_State := B_RELEASED;
@@ -47,12 +46,12 @@ package UI.Buttons is
    NO_EVENT : constant Button_Event := 0;
 
    --  Draw the button in its current state on the bitmap.
-   procedure Draw_Button (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Draw_Button (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class;
                           Button : in Button_Type);
 
    --  Layout and draw a list of buttons starting at the given top position.
    --  Each button is assigned the given width and height.
-   procedure Draw_Buttons (Buffer : in HAL.Bitmap.Bitmap_Buffer'Class;
+   procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class;
                            List   : in out Button_Array;
                            X      : in Natural;
                            Y      : in Natural;
