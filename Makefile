@@ -2,7 +2,10 @@
 
 all:  etherscope
 
-etherscope:
+ada-enet/anet_stm32fxxx.gpr:
+	cd ada-enet && ./configure --with-board=stm32f746
+
+etherscope: ada-enet/anet_stm32fxxx.gpr
 	arm-eabi-gnatmake -Petherscope -p -cargs -mno-unaligned-access
 	arm-eabi-objcopy -O binary obj/stm32f746disco/etheroscope etherscope.bin
 
