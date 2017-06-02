@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  etherscope-receiver -- Ethernet Packet Receiver
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,22 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Real_Time;
+with Ada.Synchronous_Task_Control;
 with Net.Buffers;
 with Net.Interfaces;
 with EtherScope.Analyzer.Base;
 
 package body EtherScope.Receiver is
+
+   Ready  : Ada.Synchronous_Task_Control.Suspension_Object;
+
+   --  ------------------------------
+   --  Start the receiver loop.
+   --  ------------------------------
+   procedure Start is
+   begin
+      Ada.Synchronous_Task_Control.Set_True (Ready);
+   end Start;
 
    --  ------------------------------
    --  The task that waits for packets.
@@ -30,9 +41,9 @@ package body EtherScope.Receiver is
 
       Packet  : Net.Buffers.Buffer_Type;
    begin
-      while not Ifnet.Is_Ready loop
-         delay until Ada.Real_Time.Clock + Ada.Real_Time.Seconds (1);
-      end loop;
+      --  Wait until the Ethernet driver is ready.
+      Ada.Synchronous_Task_Control.Suspend_Until_True (Ready);
+
       Net.Buffers.Allocate (Packet);
       loop
          Ifnet.Receive (Packet);
