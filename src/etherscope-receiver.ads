@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  etherscope-receiver -- Ethernet Packet Receiver
---  Copyright (C) 2016 Stephane Carrez
+--  Copyright (C) 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,9 @@ package EtherScope.Receiver is
 
    --  The Ethernet interface driver.
    Ifnet     : Net.Interfaces.STM32.STM32_Ifnet;
+
+   --  Start the receiver loop.
+   procedure Start;
 
    --  The task that waits for packets.
    task Controller with
