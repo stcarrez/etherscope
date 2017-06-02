@@ -20,7 +20,6 @@ with Interfaces;
 
 with Ada.Real_Time;
 
---  with STM32.Button;
 with STM32.Board;
 with STM32.RNG.Interrupts;
 with STM32.Eth;
@@ -62,7 +61,6 @@ procedure Etheroscope with Priority => System.Priority'First is
    Graph_Mode       : EtherScope.Stats.Graph_Kind := EtherScope.Stats.G_ETHERNET;
 begin
    STM32.RNG.Interrupts.Initialize_RNG;
-   --  STM32.Button.Initialize;
 
    --  Initialize the display and draw the main/fixed frames in both buffers.
    EtherScope.Display.Initialize;
@@ -83,6 +81,7 @@ begin
    --  Setup some receive buffers and initialize the Ethernet driver.
    Net.Buffers.Add_Region (STM32.SDRAM.Reserve (Amount => HAL.UInt32 (NET_BUFFER_SIZE)), NET_BUFFER_SIZE);
    EtherScope.Receiver.Ifnet.Initialize;
+   EtherScope.Receiver.Start;
 
    Refresh_Deadline := Ada.Real_Time.Clock + REFRESH_PERIOD;
 
