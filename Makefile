@@ -16,3 +16,4 @@ checkout:
 	git submodule init
 	git submodule update
 	cd ada-enet/Ada_Drivers_Library && git submodule init && git submodule update
+	cd ada-enet/Ada_Drivers_Library/embedded-runtimes && git submodule init && git submodule update
