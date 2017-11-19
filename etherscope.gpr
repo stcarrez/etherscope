@@ -1,4 +1,4 @@
-with "ada-enet/Ada_Drivers_Library/boards/stm32f746_discovery";
+with "ada-enet/Ada_Drivers_Library/boards/stm32f746_discovery/stm32f746_discovery";
 with "ada-enet/anet_stm32fxxx";
 
 project Etherscope extends "ada-enet/Ada_Drivers_Library/examples/shared/common/common.gpr" is
